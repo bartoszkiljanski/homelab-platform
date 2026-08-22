@@ -5,6 +5,7 @@ namespace: external-secrets
 
 resources:
   - bitwarden-pki.yaml
+  - cluster-secret-store.yaml
 
 helmCharts:
   - name: external-secrets
