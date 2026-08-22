@@ -4,6 +4,10 @@ crds:
   install: true
   keep: true
 
+configs:
+  cm:
+    kustomize.buildOptions: "--enable-helm"
+
 server:
   service:
     type: ClusterIP
