@@ -7,6 +7,15 @@ kubeProxyReplacement: true
 k8sServiceHost: localhost
 k8sServicePort: 7445
 
+l2announcements:
+  enabled: true
+
+# L2 announcement leases add API traffic. This comfortably covers the small
+# number of LoadBalancer Services expected in this cluster.
+k8sClientRateLimit:
+  qps: 10
+  burst: 20
+
 cgroup:
   autoMount:
     enabled: false

@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: lan
+spec:
+  serviceSelector:
+    matchLabels:
+      homelab.platform/exposure: lan
+  nodeSelector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+  interfaces:
+    - ^eth0$
+  externalIPs: false
+  loadBalancerIPs: true
