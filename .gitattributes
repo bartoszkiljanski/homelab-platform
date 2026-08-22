@@ -1,0 +1,24 @@
+* text=auto
+
+*.md text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=lf
+*.tf text eol=lf
+*.tfvars.example text eol=lf
+*.hcl text eol=lf
+*.hcl.example text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.zst binary
+*.iso binary

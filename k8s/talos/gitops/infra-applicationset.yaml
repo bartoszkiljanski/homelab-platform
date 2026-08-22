@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: infra
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - git:
+        repoURL: git@github.com:bartoszkiljanski/homelab-platform.git
+        revision: main
+        files:
+          - path: k8s/talos/infra/*/config.json
+  template:
+    metadata:
+      name: "{{ .name }}"
+      namespace: argocd
+    spec:
+      project: infra
+      sources:
+        - repoURL: "{{ .chartRepository }}"
+          chart: "{{ .chart }}"
+          targetRevision: "{{ .chartVersion }}"
+          helm:
+            releaseName: "{{ .releaseName }}"
+            valueFiles:
+              - "$values/{{ .valuesFile }}"
+        - repoURL: git@github.com:bartoszkiljanski/homelab-platform.git
+          targetRevision: main
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{ .namespace }}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - ApplyOutOfSyncOnly=true
+          - PruneLast=true
+          - RespectIgnoreDifferences=true
+          - ServerSideApply=true

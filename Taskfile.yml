@@ -1,0 +1,193 @@
+version: '3'
+
+vars:
+  FOUNDATION_DIR: terraform/homelab/foundation
+  BOOTSTRAP_DIR: terraform/homelab/bootstrap
+  LOCAL_DIR: '{{.ROOT_DIR}}/.local'
+  GENERATED_DIR: '{{.LOCAL_DIR}}/generated/prod/talos'
+  KUBECONFIG_FILE: '{{.GENERATED_DIR}}/kubeconfig'
+  TALOSCONFIG_FILE: '{{.GENERATED_DIR}}/talosconfig'
+  DEPLOY_KEY_FILE: '{{.LOCAL_DIR}}/credentials/argocd/homelab-platform-ed25519'
+  GIT_REPOSITORY: git@github.com:bartoszkiljanski/homelab-platform.git
+  PROXMOX_HOST: 192.168.1.25
+  CONTROL_PLANE_IPS: 192.168.1.201,192.168.1.202,192.168.1.203
+
+env:
+  KUBECONFIG: '{{.KUBECONFIG_FILE}}'
+  TALOSCONFIG: '{{.TALOSCONFIG_FILE}}'
+
+tasks:
+  default:
+    desc: List the supported homelab workflows
+    cmds:
+      - task --list
+
+  doctor:
+    desc: Check the workstation and Proxmox connection prerequisites
+    preconditions:
+      - sh: 'test -n "${PROXMOX_VE_ENDPOINT:-}"'
+        msg: PROXMOX_VE_ENDPOINT is not set in this shell.
+      - sh: 'test -n "${PROXMOX_VE_API_TOKEN:-}"'
+        msg: PROXMOX_VE_API_TOKEN is not set in this shell.
+      - sh: 'test -n "${PROXMOX_VE_SSH_USERNAME:-}"'
+        msg: PROXMOX_VE_SSH_USERNAME is not set in this shell.
+      - sh: >-
+          test -n "${PROXMOX_VE_SSH_PASSWORD:-}${PROXMOX_VE_SSH_PRIVATE_KEY:-}"
+          || test "${PROXMOX_VE_SSH_AGENT:-false}" = "true"
+        msg: Configure Proxmox SSH password, private-key, or agent authentication.
+      - sh: 'test -r "${HOME}/.ssh/known_hosts"'
+        msg: The SSH known_hosts file is missing or unreadable.
+      - sh: 'ssh-keygen -l -f "${HOME}/.ssh/known_hosts" >/dev/null'
+        msg: The SSH known_hosts file is malformed.
+      - sh: 'ssh-keygen -F "{{.PROXMOX_HOST}}" -f "${HOME}/.ssh/known_hosts" >/dev/null'
+        msg: The SSH known_hosts file lacks the Proxmox host.
+    cmds:
+      - task --version
+      - terraform version
+      - talosctl version --client
+      - kubectl version --client
+      - git --version
+      - "echo 'PASS: required tools, credentials, and Proxmox SSH host identity are available.'"
+
+  fmt:
+    desc: Format all Terraform source files
+    cmds:
+      - terraform fmt -recursive terraform
+
+  validate:
+    desc: Initialize, format-check, and validate both Terraform roots
+    cmds:
+      - task: _init
+      - terraform fmt -check -diff -recursive terraform
+      - terraform -chdir={{.FOUNDATION_DIR}} validate -no-color
+      - terraform -chdir={{.BOOTSTRAP_DIR}} validate -no-color
+
+  plan:
+    desc: Show foundation and, when available, bootstrap changes
+    cmds:
+      - task: doctor
+      - task: validate
+      - terraform -chdir={{.FOUNDATION_DIR}} plan -input=false -no-color
+      - cmd: terraform -chdir={{.BOOTSTRAP_DIR}} plan -input=false -no-color
+        if: 'test -f "{{.KUBECONFIG_FILE}}"'
+
+  up:
+    desc: Build or reconcile the complete Talos and GitOps platform
+    cmds:
+      - task: doctor
+      - task: _gitops_preflight
+      - task: _init
+      - terraform -chdir={{.FOUNDATION_DIR}} apply -auto-approve -input=false -no-color
+      - talosctl health --endpoints {{.CONTROL_PLANE_IPS}} --wait-timeout 15m --server=false
+      - task: _argocd_credentials
+      - terraform -chdir={{.BOOTSTRAP_DIR}} apply -auto-approve -input=false -no-color
+      - task: status
+
+  down:
+    desc: Destroy bootstrap first and then the Talos foundation
+    requires:
+      vars: [CONFIRM]
+    preconditions:
+      - sh: 'test "{{.CONFIRM}}" = "destroy"'
+        msg: Run task down CONFIRM=destroy for an intentional clean teardown.
+    cmds:
+      - task: doctor
+      - task: _init
+      - task: _argocd_quiesce
+      - terraform -chdir={{.BOOTSTRAP_DIR}} destroy -auto-approve -input=false -no-color
+      - terraform -chdir={{.FOUNDATION_DIR}} destroy -auto-approve -input=false -no-color
+
+  rebuild:
+    desc: Destroy and recreate the complete platform in one ordered workflow
+    requires:
+      vars: [CONFIRM]
+    preconditions:
+      - sh: 'test "{{.CONFIRM}}" = "rebuild"'
+        msg: Run task rebuild CONFIRM=rebuild to replace the whole cluster.
+    cmds:
+      - task: down
+        vars:
+          CONFIRM: destroy
+      - task: up
+
+  status:
+    desc: Validate Talos, etcd, Kubernetes, Cilium, DNS, and Argo CD
+    preconditions:
+      - sh: 'test -s "{{.KUBECONFIG_FILE}}"'
+        msg: The generated kubeconfig is missing; run task up first.
+      - sh: 'test -s "{{.TALOSCONFIG_FILE}}"'
+        msg: The generated talosconfig is missing; run task up first.
+    cmds:
+      - talosctl health --endpoints {{.CONTROL_PLANE_IPS}} --wait-timeout 10m --server=false
+      - talosctl etcd status --nodes {{.CONTROL_PLANE_IPS}} --endpoints {{.CONTROL_PLANE_IPS}}
+      - kubectl wait --for=condition=Ready node --all --timeout=10m
+      - kubectl -n kube-system rollout status daemonset/cilium daemonset/cilium-envoy deployment/cilium-operator deployment/coredns --timeout=10m
+      - task: _dns_check
+      - kubectl -n argocd wait --for=create application/root --timeout=10m
+      - kubectl -n argocd wait --for=create application/cilium --timeout=10m
+      - kubectl -n argocd wait --for=create application/argocd --timeout=10m
+      - kubectl -n argocd wait applications --all --for=jsonpath='{.status.sync.status}'=Synced --timeout=10m
+      - kubectl -n argocd wait applications --all --for=jsonpath='{.status.health.status}'=Healthy --timeout=10m
+      - kubectl get --raw='/readyz?verbose'
+
+  k9s:
+    desc: Open k9s using the generated homelab kubeconfig
+    preconditions:
+      - sh: 'test -s "{{.KUBECONFIG_FILE}}"'
+        msg: Run task up before opening the cluster.
+    cmds:
+      - k9s
+    interactive: true
+
+  kubectl:
+    desc: Run kubectl against the cluster (task kubectl -- get nodes)
+    cmds:
+      - kubectl {{.CLI_ARGS}}
+
+  talosctl:
+    desc: Run talosctl against the cluster (task talosctl -- health)
+    cmds:
+      - talosctl {{.CLI_ARGS}}
+
+  _init:
+    internal: true
+    cmds:
+      - mkdir -p "{{.LOCAL_DIR}}/terraform-state/prod/foundation" "{{.LOCAL_DIR}}/terraform-state/prod/bootstrap"
+      - terraform -chdir={{.FOUNDATION_DIR}} init -input=false -no-color
+      - terraform -chdir={{.BOOTSTRAP_DIR}} init -input=false -no-color
+
+  _gitops_preflight:
+    internal: true
+    preconditions:
+      - sh: 'test -s "{{.DEPLOY_KEY_FILE}}"'
+        msg: The ignored Argo CD deploy private key is missing.
+      - sh: 'git rev-parse --verify origin/main >/dev/null 2>&1'
+        msg: Fetch or publish the private repository main branch before bootstrap.
+      - sh: 'git diff --quiet origin/main -- k8s/talos/gitops k8s/talos/infra'
+        msg: GitOps manifests differ from origin/main; publish the reviewed revision first.
+      - sh: 'test -z "$(git ls-files --others --exclude-standard -- k8s/talos/gitops k8s/talos/infra)"'
+        msg: Untracked GitOps manifests must be reviewed and published first.
+
+  _argocd_credentials:
+    internal: true
+    cmds:
+      - kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+      - kubectl -n argocd create secret generic argocd-repo-homelab-platform --from-literal=type=git --from-literal=url={{.GIT_REPOSITORY}} --from-file=sshPrivateKey="{{.DEPLOY_KEY_FILE}}" --dry-run=client -o yaml | kubectl apply -f -
+      - kubectl -n argocd label secret argocd-repo-homelab-platform argocd.argoproj.io/secret-type=repository --overwrite
+
+  _argocd_quiesce:
+    internal: true
+    cmds:
+      - cmd: kubectl -n argocd scale statefulset/argocd-application-controller --replicas=0
+        ignore_error: true
+      - cmd: kubectl -n argocd scale deployment/argocd-applicationset-controller --replicas=0
+        ignore_error: true
+
+  _dns_check:
+    internal: true
+    cmds:
+      - kubectl -n default delete pod homelab-dns-check --ignore-not-found --wait=true
+      - defer: kubectl -n default delete pod homelab-dns-check --ignore-not-found --wait=true
+      - kubectl -n default create -f "{{.ROOT_DIR}}/k8s/talos/tests/dns-check.yaml"
+      - kubectl -n default wait pod/homelab-dns-check --for=condition=Ready --timeout=2m
+      - kubectl -n default exec pod/homelab-dns-check -- nslookup kubernetes.default.svc.cluster.local

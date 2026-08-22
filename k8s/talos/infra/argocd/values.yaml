@@ -1,0 +1,9 @@
+# Initial Terraform bootstrap values for Argo CD.
+# Keep this file aligned with the future GitOps-managed Argo CD definition.
+crds:
+  install: true
+  keep: true
+
+server:
+  service:
+    type: ClusterIP
