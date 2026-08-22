@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: infra
+  name: apps
   namespace: argocd
 spec:
   goTemplate: true
@@ -12,20 +12,20 @@ spec:
         repoURL: git@github.com:bartoszkiljanski/homelab-platform.git
         revision: main
         directories:
-          - path: k8s/talos/infra/*
+          - path: k8s/talos/apps/*
   template:
     metadata:
       name: "{{ .path.basename }}"
       namespace: argocd
     spec:
-      project: infra
+      project: apps
       source:
         repoURL: git@github.com:bartoszkiljanski/homelab-platform.git
         targetRevision: main
         path: "{{ .path.path }}"
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{ if or (eq .path.basename "cilium") (eq .path.basename "metrics-server") }}kube-system{{ else }}{{ .path.basename }}{{ end }}'
+        namespace: "{{ .path.basename }}"
       syncPolicy:
         automated:
           prune: true

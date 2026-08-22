@@ -1,20 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: infra
+  name: apps
   namespace: argocd
 spec:
-  description: Cluster infrastructure managed from the private homelab repository.
+  description: Namespaced homelab workloads managed from the private repository.
   sourceRepos:
     - git@github.com:bartoszkiljanski/homelab-platform.git
-    - https://argoproj.github.io/argo-helm
-    - https://helm.cilium.io/
   destinations:
     - namespace: "*"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
-    - group: "*"
-      kind: "*"
+    - group: ""
+      kind: Namespace
   namespaceResourceWhitelist:
     - group: "*"
       kind: "*"
