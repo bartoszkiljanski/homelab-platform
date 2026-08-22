@@ -3,6 +3,9 @@ kind: Kustomization
 
 namespace: external-secrets
 
+resources:
+  - bitwarden-pki.yaml
+
 helmCharts:
   - name: external-secrets
     repo: https://charts.external-secrets.io
