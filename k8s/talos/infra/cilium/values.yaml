@@ -16,6 +16,10 @@ k8sClientRateLimit:
   qps: 10
   burst: 20
 
+# Restart agents when their rendered ConfigMap changes so GitOps configuration
+# updates take effect without an imperative rollout command.
+rollOutCiliumPods: true
+
 cgroup:
   autoMount:
     enabled: false
