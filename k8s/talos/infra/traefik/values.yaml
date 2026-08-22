@@ -1,0 +1,45 @@
+deployment:
+  replicas: 2
+
+providers:
+  kubernetesIngress:
+    enabled: false
+  kubernetesGateway:
+    enabled: true
+
+gateway:
+  enabled: true
+  listeners:
+    web:
+      port: 8000
+      protocol: HTTP
+      namespacePolicy:
+        from: All
+
+service:
+  labels:
+    homelab.platform/exposure: lan
+  annotations:
+    lbipam.cilium.io/ips: 192.168.1.210
+  spec:
+    type: LoadBalancer
+
+ingressRoute:
+  dashboard:
+    enabled: false
+
+logs:
+  general:
+    level: INFO
+  access:
+    enabled: true
+
+metrics:
+  prometheus: null
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 96Mi
+  limits:
+    memory: 256Mi
