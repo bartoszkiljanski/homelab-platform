@@ -1,9 +1,0 @@
-{
-  "name": "argocd",
-  "namespace": "argocd",
-  "chart": "argo-cd",
-  "chartRepository": "https://argoproj.github.io/argo-helm",
-  "chartVersion": "10.3.0",
-  "releaseName": "argocd",
-  "valuesFile": "k8s/talos/infra/argocd/values.yaml"
-}

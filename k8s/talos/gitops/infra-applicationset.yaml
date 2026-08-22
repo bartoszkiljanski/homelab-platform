@@ -11,34 +11,28 @@ spec:
     - git:
         repoURL: git@github.com:bartoszkiljanski/homelab-platform.git
         revision: main
-        files:
-          - path: k8s/talos/infra/*/config.json
+        directories:
+          - path: k8s/talos/infra/*
   template:
     metadata:
-      name: "{{ .name }}"
+      name: "{{ .path.basename }}"
       namespace: argocd
     spec:
       project: infra
-      sources:
-        - repoURL: "{{ .chartRepository }}"
-          chart: "{{ .chart }}"
-          targetRevision: "{{ .chartVersion }}"
-          helm:
-            releaseName: "{{ .releaseName }}"
-            valueFiles:
-              - "$values/{{ .valuesFile }}"
-        - repoURL: git@github.com:bartoszkiljanski/homelab-platform.git
-          targetRevision: main
-          ref: values
+      source:
+        repoURL: git@github.com:bartoszkiljanski/homelab-platform.git
+        targetRevision: main
+        path: "{{ .path.path }}"
       destination:
         server: https://kubernetes.default.svc
-        namespace: "{{ .namespace }}"
+        namespace: '{{ if eq .path.basename "cilium" }}kube-system{{ else }}{{ .path.basename }}{{ end }}'
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
         syncOptions:
           - ApplyOutOfSyncOnly=true
+          - CreateNamespace=true
           - PruneLast=true
           - RespectIgnoreDifferences=true
           - ServerSideApply=true
