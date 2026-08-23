@@ -21,6 +21,7 @@ providers:
 
 gateway:
   enabled: true
+  name: lan
   listeners:
     web:
       port: 8000
