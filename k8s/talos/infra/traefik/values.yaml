@@ -18,6 +18,8 @@ providers:
     enabled: false
   kubernetesGateway:
     enabled: true
+  kubernetesCRD:
+    enabled: false
 
 gateway:
   enabled: true
