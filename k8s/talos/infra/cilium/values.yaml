@@ -31,6 +31,16 @@ bpf:
 
 operator:
   replicas: 2
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          io.cilium/app: operator
 
 securityContext:
   capabilities:
