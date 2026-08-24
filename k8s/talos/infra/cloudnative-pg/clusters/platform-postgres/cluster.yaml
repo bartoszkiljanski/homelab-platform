@@ -7,6 +7,13 @@ metadata:
 spec:
   instances: 2
 
+  plugins:
+    - enabled: true
+      name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: platform-postgres-b2
+
   storage:
     storageClass: synology-csi-iscsi-retain
     size: 20Gi

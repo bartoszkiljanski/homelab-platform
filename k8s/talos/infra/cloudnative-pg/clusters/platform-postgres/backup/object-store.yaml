@@ -1,0 +1,26 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: platform-postgres-b2
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  configuration:
+    destinationPath: "s3://lanlord-cnpg-backups/platform-postgres"
+    endpointURL: "https://s3.eu-central-003.backblazeb2.com"
+
+    s3Credentials:
+      accessKeyId:
+        name: b2-cnpg
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: b2-cnpg
+        key: ACCESS_SECRET_KEY
+
+    wal:
+      compression: gzip
+
+    data:
+      compression: gzip
+
+  retentionPolicy: "30d"
