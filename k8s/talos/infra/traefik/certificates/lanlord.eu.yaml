@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: home-lanlord-eu
+  namespace: traefik
+spec:
+  secretName: home-lanlord-eu-tls
+
+  dnsNames:
+    - "*.home.lanlord.eu"
+    - home.lanlord.eu
+
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer

@@ -3,6 +3,10 @@ kind: Kustomization
 
 namespace: cert-manager
 
+resources:
+  - externalsecrets.yaml
+  - issuers/clusterissuer-production.yaml
+
 helmCharts:
   - name: cert-manager
     repo: https://charts.jetstack.io

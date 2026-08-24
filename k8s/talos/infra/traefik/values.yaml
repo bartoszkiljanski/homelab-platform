@@ -30,12 +30,22 @@ gateway:
       protocol: HTTP
       namespacePolicy:
         from: All
-
+    websecure:
+      port: 8443
+      protocol: HTTPS
+      hostname: "*.home.lanlord.eu"
+      namespacePolicy:
+        from: All
+      mode: Terminate
+      certificateRefs:
+        - group: ''
+          kind: Secret
+          name: home-lanlord-eu-tls
 service:
   labels:
     homelab.platform/exposure: lan
   annotations:
-    lbipam.cilium.io/ips: 192.168.1.210
+    lbipam.cilium.io/ips: "192.168.1.210"
   spec:
     type: LoadBalancer
 

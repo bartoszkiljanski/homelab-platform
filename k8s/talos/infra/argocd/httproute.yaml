@@ -9,7 +9,7 @@ spec:
       kind: Gateway
       name: lan
       namespace: traefik
-      sectionName: web
+      sectionName: websecure
 
   hostnames:
     - argocd.home.lanlord.eu
