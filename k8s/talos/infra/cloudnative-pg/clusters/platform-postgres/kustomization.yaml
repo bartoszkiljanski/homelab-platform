@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - cluster.yaml
   - backup
-  - cluster-restore-test.yaml
+  # - cluster-restore-test.yaml
