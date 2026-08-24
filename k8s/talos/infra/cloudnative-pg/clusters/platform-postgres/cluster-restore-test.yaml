@@ -1,0 +1,22 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: platform-postgres-restore-test
+spec:
+  instances: 1
+
+  bootstrap:
+    recovery:
+      source: origin
+
+  externalClusters:
+    - name: origin
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: platform-postgres-b2
+          serverName: platform-postgres
+
+  storage:
+    storageClass: synology-csi-iscsi-delete
+    size: 20Gi
