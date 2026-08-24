@@ -1,0 +1,66 @@
+clientInfoSecret:
+  create: false
+  name: synology-csi-client-info
+
+installCSIDriver: true
+
+node:
+  kubeletPath: /var/lib/kubelet
+
+  plugin:
+    extraArgs:
+      - --iscsiadm-path=/usr/local/sbin/iscsiadm
+
+storageClasses:
+  iscsi-delete:
+    reclaimPolicy: Delete
+    test: false
+    volumeBindingMode: WaitForFirstConsumer
+
+    parameters:
+      protocol: iscsi
+      dsm: "10.250.0.2"
+      location: "/volume1"
+      fsType: ext4
+      enableFuaSyncCache: "true"
+      enableSpaceReclamation: "false"
+
+  iscsi-retain:
+    reclaimPolicy: Retain
+    test: false
+    volumeBindingMode: WaitForFirstConsumer
+
+    parameters:
+      protocol: iscsi
+      dsm: "10.250.0.2"
+      location: "/volume1"
+      fsType: ext4
+      enableFuaSyncCache: "true"
+      enableSpaceReclamation: "false"
+
+  nfs-delete:
+    disabled: true
+
+  nfs-retain:
+    disabled: true
+
+  smb-delete:
+    disabled: true
+
+  smb-retain:
+    disabled: true
+
+volumeSnapshotClasses:
+  delete:
+    deletionPolicy: Delete
+    disabled: false
+
+    parameters:
+      is_locked: "false"
+
+  retain:
+    deletionPolicy: Retain
+    disabled: false
+
+    parameters:
+      is_locked: "false"
