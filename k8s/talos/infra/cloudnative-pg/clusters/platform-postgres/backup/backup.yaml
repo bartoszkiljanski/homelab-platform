@@ -1,0 +1,14 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: platform-postgres-initial
+  annotations:
+    argocd.argoproj.io/sync-wave: "40"
+spec:
+  cluster:
+    name: platform-postgres
+
+  method: plugin
+
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
