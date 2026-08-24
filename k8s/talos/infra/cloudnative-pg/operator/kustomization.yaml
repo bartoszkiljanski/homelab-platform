@@ -3,9 +3,6 @@ kind: Kustomization
 
 namespace: cloudnative-pg
 
-resources:
-  - clusters/platform-postgres
-
 helmCharts:
   - name: cloudnative-pg
     repo: https://cloudnative-pg.github.io/charts
