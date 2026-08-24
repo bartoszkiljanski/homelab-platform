@@ -1,12 +1,16 @@
 apiVersion: postgresql.cnpg.io/v1
-kind: Backup
+kind: ScheduledBackup
 metadata:
-  name: platform-postgres-initial
+  name: platform-postgres-daily
   annotations:
     argocd.argoproj.io/sync-wave: "40"
 spec:
   cluster:
     name: platform-postgres
+
+  schedule: "0 0 21 * * *"
+  backupOwnerReference: self
+  target: prefer-standby
 
   method: plugin
 
