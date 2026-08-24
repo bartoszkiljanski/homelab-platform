@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - operator
   - clusters/platform-postgres
+  - barman-cloud
