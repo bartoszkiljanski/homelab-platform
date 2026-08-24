@@ -8,6 +8,7 @@ resources:
   # Argo CD application so they are established before the Gateway objects.
   - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/standard-install.yaml
   - certificates/lanlord.eu.yaml
+  - http-to-https.yaml
 
 helmCharts:
   - name: traefik
