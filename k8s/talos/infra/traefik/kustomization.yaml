@@ -11,7 +11,7 @@ resources:
 helmCharts:
   - name: traefik
     repo: https://traefik.github.io/charts
-    version: 40.3.0
+    version: 41.3.0
     kubeVersion: 1.36.3
     apiVersions:
       - policy/v1/PodDisruptionBudget
