@@ -12,7 +12,7 @@ spec:
       sectionName: web
 
   hostnames:
-    - argocd.home.arpa
+    - argocd.home.lanlord.eu
 
   rules:
     - matches:
