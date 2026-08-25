@@ -5,6 +5,7 @@ namespace: nfs-csi
 
 resources:
   - namespace.yaml
+  - storage/servarr-media-pv.yaml
 
 helmCharts:
   - name: csi-driver-nfs

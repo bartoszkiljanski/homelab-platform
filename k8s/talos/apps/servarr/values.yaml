@@ -1,0 +1,231 @@
+jellyfin:
+  enabled: true
+
+  persistence:
+    config:
+      enabled: true
+      storageClass: synology-nfs-retain
+      accessMode: ReadWriteMany
+      size: 10Gi
+    media:
+      enabled: true
+      existingClaim: servarr-media
+      accessMode: ReadWriteMany
+
+  extraVolumeMounts:
+    - name: media
+      mountPath: /data
+
+  extraInitContainers:
+    - name: initialize-media-layout
+      image: busybox:1.37.0
+      imagePullPolicy: IfNotPresent
+      command:
+        - /bin/sh
+        - -ec
+        - |
+          mkdir -p \
+            /data/downloads \
+            /data/tv \
+            /data/movies \
+            /data/music \
+            /data/torrents/tv \
+            /data/torrents/movies \
+            /data/torrents/music \
+            /data/media/tv \
+            /data/media/movies \
+            /data/media/music
+      volumeMounts:
+        - name: media
+          mountPath: /data
+
+  extraEnvVars:
+    - name: PUID
+      value: "1000"
+    - name: PGID
+      value: "1000"
+    - name: TZ
+      value: Europe/Warsaw
+    - name: UMASK
+      value: "002"
+
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 6
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 12
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 4Gi
+
+sonarr:
+  enabled: true
+  env:
+    PUID: "1000"
+    PGID: "1000"
+    TZ: Europe/Warsaw
+    UMASK: "002"
+  persistence:
+    enabled: true
+    path: tv
+    storageClass: synology-nfs-retain
+    accessMode: ReadWriteMany
+    size: 2Gi
+    additionalMounts:
+      - name: media
+        mountPath: /data
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+qbittorrent:
+  # Enabled after Gluetun has a real WireGuard provider configuration.
+  enabled: false
+
+prowlarr:
+  enabled: true
+  env:
+    PUID: "1000"
+    PGID: "1000"
+    TZ: Europe/Warsaw
+    UMASK: "002"
+  persistence:
+    enabled: true
+    storageClass: synology-nfs-retain
+    accessMode: ReadWriteMany
+    size: 2Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+flaresolverr:
+  enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+seerr:
+  enabled: true
+  image:
+    tag: v3.4.0
+  persistence:
+    enabled: true
+    storageClass: synology-nfs-retain
+    accessMode: ReadWriteMany
+    size: 2Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+bazarr:
+  enabled: true
+  env:
+    PUID: "1000"
+    PGID: "1000"
+    TZ: Europe/Warsaw
+  persistence:
+    enabled: true
+    storageClass: synology-nfs-retain
+    accessMode: ReadWriteMany
+    size: 2Gi
+    additionalMounts:
+      - name: media
+        mountPath: /data
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+radarr:
+  enabled: true
+  env:
+    PUID: "1000"
+    PGID: "1000"
+    TZ: Europe/Warsaw
+    UMASK: "002"
+  persistence:
+    enabled: true
+    path: movies
+    storageClass: synology-nfs-retain
+    accessMode: ReadWriteMany
+    size: 2Gi
+    additionalMounts:
+      - name: media
+        mountPath: /data
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+lidarr:
+  enabled: true
+  env:
+    PUID: "1000"
+    PGID: "1000"
+    TZ: Europe/Warsaw
+    UMASK: "002"
+  persistence:
+    enabled: true
+    path: music
+    storageClass: synology-nfs-retain
+    accessMode: ReadWriteMany
+    size: 2Gi
+    additionalMounts:
+      - name: media
+        mountPath: /data
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+cleanuparr:
+  enabled: true
+  image:
+    tag: v2.10.3
+  env:
+    BASE_PATH: ""
+    PORT: "11011"
+    PUID: "1000"
+    PGID: "1000"
+    TZ: Europe/Warsaw
+    UMASK: "002"
+  persistence:
+    enabled: true
+    storageClass: synology-nfs-retain
+    accessMode: ReadWriteMany
+    size: 1Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
