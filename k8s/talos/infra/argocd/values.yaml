@@ -29,6 +29,7 @@ configs:
     policy.default: ""
     policy.csv: |
       g, ArgoCD Admins, role:admin
+      g, Homelab Admins, role:admin
       g, ArgoCD Viewers, role:readonly
     scopes: '[groups]'
 
