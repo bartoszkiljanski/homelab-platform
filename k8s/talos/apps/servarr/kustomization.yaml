@@ -52,6 +52,21 @@ patches:
                     /media/media/movies /media/media/music
   - target:
       kind: Deployment
+      name: servarr-(lidarr|prowlarr|radarr|sonarr)
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: ignored
+      spec:
+        template:
+          spec:
+            containers:
+              - name: servarr
+                startupProbe:
+                  failureThreshold: 90
+  - target:
+      kind: Deployment
       name: servarr-cleanuparr
     patch: |-
       apiVersion: apps/v1

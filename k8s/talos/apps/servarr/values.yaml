@@ -211,6 +211,16 @@ cleanuparr:
   enabled: true
   image:
     tag: 2.10.3
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
   env:
     BASE_PATH: ""
     PORT: "11011"
