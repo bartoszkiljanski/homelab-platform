@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-proxy-outpost
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+data:
+  proxy-outpost.yaml: |
+    version: 1
+    metadata:
+      name: Embedded proxy outpost
+      labels:
+        blueprints.goauthentik.io/instantiate: "true"
+    entries:
+      - model: authentik_blueprints.metaapplyblueprint
+        attrs:
+          identifiers:
+            name: BentoPDF proxy
+          required: true
+
+      # This list is authoritative. Add every proxy provider defined by an
+      # application blueprint; separate outpost entries would overwrite it.
+      - model: authentik_outposts.outpost
+        state: present
+        identifiers:
+          managed: goauthentik.io/outposts/embedded
+        attrs:
+          name: authentik Embedded Outpost
+          providers:
+            - !Find [authentik_providers_proxy.proxyprovider, [name, BentoPDF]]

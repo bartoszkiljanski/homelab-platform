@@ -1,0 +1,20 @@
+replicaCount: 1
+
+serviceAccount:
+  create: true
+  automountServiceAccountToken: false
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 256Mi

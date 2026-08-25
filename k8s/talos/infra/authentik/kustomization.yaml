@@ -5,7 +5,11 @@ namespace: authentik
 
 resources:
   - external-secret.yaml
+  - groups-blueprint.yaml
   - argocd-blueprint.yaml
+  - bentopdf-blueprint.yaml
+  - proxy-outpost-blueprint.yaml
+  - bentopdf-reference-grant.yaml
 
 helmCharts:
   - name: authentik

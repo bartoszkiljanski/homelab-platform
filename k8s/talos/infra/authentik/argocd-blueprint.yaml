@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: authentik-blueprints
+  name: authentik-blueprint-argocd
   annotations:
     argocd.argoproj.io/sync-wave: "-5"
 data:
@@ -12,43 +12,11 @@ data:
       labels:
         blueprints.goauthentik.io/instantiate: "true"
     entries:
-      - model: authentik_core.group
-        id: argocd-admins
-        state: present
-        identifiers:
-          name: ArgoCD Admins
+      - model: authentik_blueprints.metaapplyblueprint
         attrs:
-          name: ArgoCD Admins
-          is_superuser: false
-          users:
-            - !Find [authentik_core.user, [username, akadmin]]
-
-      - model: authentik_core.group
-        id: argocd-viewers
-        state: present
-        identifiers:
-          name: ArgoCD Viewers
-        attrs:
-          name: ArgoCD Viewers
-          is_superuser: false
-
-      - model: authentik_core.group
-        id: homelab-admins
-        state: present
-        identifiers:
-          name: Homelab Admins
-        attrs:
-          name: Homelab Admins
-          is_superuser: true
-
-      - model: authentik_core.group
-        id: homelab-users
-        state: present
-        identifiers:
-          name: Homelab Users
-        attrs:
-          name: Homelab Users
-          is_superuser: false
+          identifiers:
+            name: Homelab groups
+          required: true
 
       - model: authentik_providers_oauth2.oauth2provider
         id: argocd-provider
@@ -98,7 +66,7 @@ data:
           target: !KeyOf argocd-application
           order: 0
         attrs:
-          group: !KeyOf argocd-admins
+          group: !Find [authentik_core.group, [name, ArgoCD Admins]]
 
       - model: authentik_policies.policybinding
         state: present
@@ -106,7 +74,7 @@ data:
           target: !KeyOf argocd-application
           order: 1
         attrs:
-          group: !KeyOf homelab-admins
+          group: !Find [authentik_core.group, [name, Homelab Admins]]
 
       - model: authentik_policies.policybinding
         state: present
@@ -114,4 +82,4 @@ data:
           target: !KeyOf argocd-application
           order: 2
         attrs:
-          group: !KeyOf argocd-viewers
+          group: !Find [authentik_core.group, [name, ArgoCD Viewers]]

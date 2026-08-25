@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: bentopdf
+
+resources:
+  - httproute.yaml
+
+helmCharts:
+  - name: bentopdf
+    repo: https://kriegalex.github.io/k8s-charts/
+    version: 2.0.0
+    releaseName: bentopdf
+    namespace: bentopdf
+    valuesFile: values.yaml
+
+patches:
+  - target:
+      kind: Pod
+      name: bentopdf-test-connection
+    patch: |-
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: bentopdf-test-connection
+      $patch: delete

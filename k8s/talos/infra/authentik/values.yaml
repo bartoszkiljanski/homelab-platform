@@ -21,7 +21,10 @@ serviceAccount:
 
 blueprints:
   configMaps:
-    - authentik-blueprints
+    - authentik-blueprint-groups
+    - authentik-blueprint-argocd
+    - authentik-blueprint-bentopdf
+    - authentik-blueprint-proxy-outpost
 
 server:
   replicas: 1
