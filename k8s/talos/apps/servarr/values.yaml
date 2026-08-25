@@ -210,7 +210,7 @@ lidarr:
 cleanuparr:
   enabled: true
   image:
-    tag: v2.10.3
+    tag: 2.10.3
   env:
     BASE_PATH: ""
     PORT: "11011"
