@@ -30,6 +30,10 @@ data:
           internal_host: http://bentopdf.bentopdf.svc.cluster.local:8080
           internal_host_ssl_validation: false
           intercept_header_auth: true
+          # BentoPDF registers this file as a service worker. Its background
+          # update checks must not start a second OAuth flow during login.
+          skip_path_regex: |-
+            ^/sw\.js$
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
