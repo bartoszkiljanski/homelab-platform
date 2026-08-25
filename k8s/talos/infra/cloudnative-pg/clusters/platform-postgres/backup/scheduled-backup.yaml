@@ -8,7 +8,8 @@ spec:
   cluster:
     name: platform-postgres
 
-  schedule: "0 0 21 * * *"
+  # Six-field CNPG cron: daily at 02:00:00 UTC.
+  schedule: "0 0 2 * * *"
   backupOwnerReference: self
   target: prefer-standby
 

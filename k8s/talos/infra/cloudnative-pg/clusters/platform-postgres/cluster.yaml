@@ -3,9 +3,21 @@ kind: Cluster
 metadata:
   name: platform-postgres
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "30"
 spec:
   instances: 2
+
+  managed:
+    roles:
+      - name: authentik
+        ensure: present
+        comment: Authentik application role
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        passwordSecret:
+          name: authentik-postgres
 
   plugins:
     - enabled: true
@@ -17,3 +29,9 @@ spec:
   storage:
     storageClass: synology-csi-iscsi-retain
     size: 20Gi
+
+  backup:
+    target: prefer-standby
+    volumeSnapshot:
+      className: synology-csi-retain
+      online: true

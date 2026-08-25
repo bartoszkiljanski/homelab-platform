@@ -9,6 +9,31 @@ configs:
     server.insecure: true
   cm:
     kustomize.buildOptions: "--enable-helm"
+    url: https://argocd.home.lanlord.eu
+    # Retain the built-in admin until Authentik SSO is proven and documented.
+    admin.enabled: "true"
+    oidc.config: |
+      name: Authentik
+      issuer: https://authentik.home.lanlord.eu/application/o/argocd/
+      clientID: argocd
+      clientSecret: $argocd-authentik-oidc:clientSecret
+      requestedScopes:
+        - openid
+        - profile
+        - email
+        - offline_access
+      requestedIDTokenClaims:
+        groups:
+          essential: true
+  rbac:
+    policy.default: ""
+    policy.csv: |
+      g, ArgoCD Admins, role:admin
+      g, ArgoCD Viewers, role:readonly
+    scopes: '[groups]'
+
+dex:
+  enabled: false
 
 server:
   service:

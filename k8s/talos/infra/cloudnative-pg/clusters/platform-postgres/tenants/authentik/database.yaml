@@ -1,0 +1,12 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: platform-postgres-authentik
+  annotations:
+    argocd.argoproj.io/sync-wave: "35"
+spec:
+  name: authentik
+  owner: authentik
+  databaseReclaimPolicy: retain
+  cluster:
+    name: platform-postgres

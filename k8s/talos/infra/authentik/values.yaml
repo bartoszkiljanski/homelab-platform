@@ -1,0 +1,53 @@
+global:
+  envFrom:
+    - secretRef:
+        name: authentik-secrets
+
+authentik:
+  error_reporting:
+    enabled: false
+  postgresql:
+    host: platform-postgres-rw.cloudnative-pg.svc.cluster.local
+    name: authentik
+    user: authentik
+    port: 5432
+
+postgresql:
+  enabled: false
+
+# Managed outposts are not required, so avoid creating their cluster-scoped RBAC.
+serviceAccount:
+  create: false
+
+blueprints:
+  configMaps:
+    - authentik-blueprints
+
+server:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+  route:
+    main:
+      enabled: true
+      hostnames:
+        - authentik.home.lanlord.eu
+      parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: lan
+          namespace: traefik
+          sectionName: websecure
+
+worker:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
