@@ -128,7 +128,7 @@ PowerShell_transcript.*.txt
 coverage/
 
 # Kustomize downloads Helm charts here while rendering.
-k8s/talos/infra/*/charts/
+k8s/talos/**/charts/
 
 # Editors and operating systems
 .vscode/

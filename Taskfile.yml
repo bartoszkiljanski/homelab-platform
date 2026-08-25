@@ -163,9 +163,9 @@ tasks:
         msg: The ignored Argo CD deploy private key is missing.
       - sh: 'git rev-parse --verify origin/main >/dev/null 2>&1'
         msg: Fetch or publish the private repository main branch before bootstrap.
-      - sh: 'git diff --quiet origin/main -- k8s/talos/gitops k8s/talos/infra'
+      - sh: 'git diff --quiet origin/main -- k8s/talos/gitops k8s/talos/infra k8s/talos/apps'
         msg: GitOps manifests differ from origin/main; publish the reviewed revision first.
-      - sh: 'test -z "$(git ls-files --others --exclude-standard -- k8s/talos/gitops k8s/talos/infra)"'
+      - sh: 'test -z "$(git ls-files --others --exclude-standard -- k8s/talos/gitops k8s/talos/infra k8s/talos/apps)"'
         msg: Untracked GitOps manifests must be reviewed and published first.
 
   _argocd_credentials:

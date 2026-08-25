@@ -31,7 +31,9 @@ single Proxmox host as a physical failure domain.
 | Talos Linux | 1.13.9 | Terraform |
 | Kubernetes | 1.36.3 | Talos |
 | Cilium | 1.20.1 | Terraform bootstrap, then Argo CD |
-| Argo CD | chart 10.3.0 | Terraform bootstrap, then Argo CD |
+| Argo CD | chart 10.4.0 | Terraform bootstrap, then Argo CD |
+| CloudNativePG | chart 0.29.0 | Argo CD |
+| Authentik | 2026.8.0 | Argo CD |
 
 The `foundation` Terraform root manages the Talos image, NoCloud snippets,
 VMs, machine configuration, etcd bootstrap, and generated client files. The
@@ -48,6 +50,7 @@ VMs, machine configuration, etcd bootstrap, and generated client files. The
 `-- k8s/talos/
     |-- gitops/           # Argo CD root objects
     |-- infra/            # Argo-managed releases
+    |-- apps/             # Namespaced workloads
     `-- tests/            # disposable validation workloads
 ```
 
@@ -82,6 +85,18 @@ Place the private repository's read-only Argo CD deploy key at:
 ```text
 .local/credentials/argocd/homelab-platform-ed25519
 ```
+
+Create these Bitwarden Secrets Manager entries before enabling Authentik:
+
+```text
+AUTHENTIK_SECRET_KEY
+AUTHENTIK_BOOTSTRAP_PASSWORD
+AUTHENTIK_POSTGRES_PASSWORD
+AUTHENTIK_ARGOCD_CLIENT_SECRET
+```
+
+Use independent random values. The OIDC client secret is intentionally read by
+both the Authentik blueprint and Argo CD.
 
 ## Workflow
 
@@ -143,4 +158,5 @@ See [SECURITY.md](SECURITY.md).
 
 - The Proxmox host is a single point of failure.
 - Local Terraform state is not an off-device backup.
-- Automated etcd recovery and persistent workload backups are not implemented.
+- Automated etcd recovery and backup coverage beyond platform PostgreSQL are
+  not implemented.
