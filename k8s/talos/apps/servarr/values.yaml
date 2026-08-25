@@ -71,6 +71,8 @@ jellyfin:
 
 sonarr:
   enabled: true
+  image:
+  tag: 4.0.19
   env:
     PUID: "1000"
     PGID: "1000"
