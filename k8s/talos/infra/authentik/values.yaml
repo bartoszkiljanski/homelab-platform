@@ -22,7 +22,7 @@ serviceAccount:
 blueprints:
   configMaps:
     - authentik-blueprint-groups
-    - authentik-blueprint-argocd
+    - authentik-blueprints
     - authentik-blueprint-bentopdf
     - authentik-blueprint-proxy-outpost
 

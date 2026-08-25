@@ -1,7 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: authentik-blueprint-argocd
+  # Preserve the original mount path so the existing file-backed blueprint
+  # instance is updated in place instead of rediscovered under a new path.
+  name: authentik-blueprints
   annotations:
     argocd.argoproj.io/sync-wave: "-5"
 data:
