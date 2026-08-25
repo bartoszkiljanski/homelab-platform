@@ -166,8 +166,6 @@ tasks:
   _gitops_preflight:
     internal: true
     preconditions:
-      - sh: 'test -s "{{.DEPLOY_KEY_FILE}}"'
-        msg: The ignored Argo CD deploy private key is missing.
       - sh: 'git rev-parse --verify origin/main >/dev/null 2>&1'
         msg: Fetch or publish the private repository main branch before bootstrap.
       - sh: 'git diff --quiet origin/main -- k8s/talos/gitops k8s/talos/infra k8s/talos/apps'
@@ -179,8 +177,17 @@ tasks:
     internal: true
     cmds:
       - kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-      - kubectl -n argocd create secret generic argocd-repo-homelab-platform --from-literal=type=git --from-literal=url={{.GIT_REPOSITORY}} --from-file=sshPrivateKey="{{.DEPLOY_KEY_FILE}}" --dry-run=client -o yaml | kubectl apply -f -
-      - kubectl -n argocd label secret argocd-repo-homelab-platform argocd.argoproj.io/secret-type=repository --overwrite
+      - |
+        if kubectl -n argocd get secret argocd-repo-homelab-platform >/dev/null 2>&1; then
+          echo 'Argo CD repository Secret already exists; routine reconciliation will not replace it.'
+        else
+          test -s "{{.DEPLOY_KEY_FILE}}" || { echo 'The ignored Argo CD deploy private key is missing.' >&2; exit 1; }
+          ssh-keygen -F github.com -f "${HOME}/.ssh/known_hosts" >/dev/null || { echo "GitHub is missing from SSH known_hosts." >&2; exit 1; }
+          GIT_SSH_COMMAND='ssh -i "{{.DEPLOY_KEY_FILE}}" -o IdentitiesOnly=yes -o BatchMode=yes' \
+            git ls-remote --exit-code "{{.GIT_REPOSITORY}}" refs/heads/main >/dev/null 2>&1 || { echo 'The Argo CD deploy key cannot read the repository.' >&2; exit 1; }
+          kubectl -n argocd create secret generic argocd-repo-homelab-platform --from-literal=type=git --from-literal=url={{.GIT_REPOSITORY}} --from-file=sshPrivateKey="{{.DEPLOY_KEY_FILE}}" --dry-run=client -o yaml | kubectl apply -f -
+          kubectl -n argocd label secret argocd-repo-homelab-platform argocd.argoproj.io/secret-type=repository --overwrite
+        fi
 
   _argocd_quiesce:
     internal: true
