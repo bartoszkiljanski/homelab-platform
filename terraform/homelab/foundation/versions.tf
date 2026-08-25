@@ -18,7 +18,8 @@ terraform {
     }
   }
 
-  backend "local" {
-    path = "../../../.local/terraform-state/prod/foundation/terraform.tfstate"
+  backend "s3" {
+    key          = "prod/foundation/terraform.tfstate"
+    use_lockfile = false
   }
 }

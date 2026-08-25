@@ -4,6 +4,7 @@ vars:
   FOUNDATION_DIR: terraform/homelab/foundation
   BOOTSTRAP_DIR: terraform/homelab/bootstrap
   LOCAL_DIR: '{{.ROOT_DIR}}/.local'
+  BACKEND_CONFIG_FILE: '{{.LOCAL_DIR}}/terraform-backend.hcl'
   GENERATED_DIR: '{{.LOCAL_DIR}}/generated/prod/talos'
   KUBECONFIG_FILE: '{{.GENERATED_DIR}}/kubeconfig'
   TALOSCONFIG_FILE: '{{.GENERATED_DIR}}/talosconfig'
@@ -151,10 +152,16 @@ tasks:
 
   _init:
     internal: true
+    preconditions:
+      - sh: 'test -s "{{.BACKEND_CONFIG_FILE}}"'
+        msg: Copy backend.hcl.example to .local/terraform-backend.hcl and configure the B2 backend.
+      - sh: 'test -n "${AWS_ACCESS_KEY_ID:-}"'
+        msg: AWS_ACCESS_KEY_ID must contain the Backblaze application key ID.
+      - sh: 'test -n "${AWS_SECRET_ACCESS_KEY:-}"'
+        msg: AWS_SECRET_ACCESS_KEY must contain the Backblaze application key.
     cmds:
-      - mkdir -p "{{.LOCAL_DIR}}/terraform-state/prod/foundation" "{{.LOCAL_DIR}}/terraform-state/prod/bootstrap"
-      - terraform -chdir={{.FOUNDATION_DIR}} init -input=false -no-color
-      - terraform -chdir={{.BOOTSTRAP_DIR}} init -input=false -no-color
+      - terraform -chdir={{.FOUNDATION_DIR}} init -input=false -no-color -backend-config="{{.BACKEND_CONFIG_FILE}}"
+      - terraform -chdir={{.BOOTSTRAP_DIR}} init -input=false -no-color -backend-config="{{.BACKEND_CONFIG_FILE}}"
 
   _gitops_preflight:
     internal: true

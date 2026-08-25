@@ -1,0 +1,15 @@
+# For DR copy this file .local/terraform-backend.hcl and replace the placeholders.
+
+bucket = "replace-with-private-b2-bucket-name"
+region = "replace-with-b2-region"
+
+endpoints = {
+  s3 = "https://s3.replace-with-b2-region.backblazeb2.com"
+}
+
+encrypt                       = true
+use_path_style                = true
+skip_credentials_validation  = true
+skip_metadata_api_check      = true
+skip_region_validation       = true
+skip_requesting_account_id   = true
