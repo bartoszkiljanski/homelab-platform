@@ -39,35 +39,10 @@ storageClasses:
       enableSpaceReclamation: "false"
 
   nfs-delete:
-    reclaimPolicy: Delete
-    test: false
-
-    mountOptions:
-      - vers=4.1
-      - hard
-      - noatime
-
-    parameters:
-      protocol: nfs
-      dsm: "10.250.0.2"
-      location: "/volume1"
-      mountPermissions: "0770"
+    disabled: true
 
   nfs-retain:
-    isDefault: true
-    reclaimPolicy: Retain
-    test: false
-
-    mountOptions:
-      - vers=4.1
-      - hard
-      - noatime
-
-    parameters:
-      protocol: nfs
-      dsm: "10.250.0.2"
-      location: "/volume1"
-      mountPermissions: "0770"
+    disabled: true
 
   smb-delete:
     disabled: true
