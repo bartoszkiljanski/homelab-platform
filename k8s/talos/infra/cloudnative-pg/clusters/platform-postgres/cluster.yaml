@@ -11,7 +11,9 @@ spec:
     roles:
       - name: authentik
         ensure: present
+        inherit: true
         comment: Authentik application role
+        connectionLimit: -1
         login: true
         superuser: false
         createdb: false
