@@ -4,6 +4,7 @@ bitwarden-sdk-server:
   enabled: true
 
   deploymentAnnotations:
+    argocd.argoproj.io/sync-wave: "25"
     reloader.stakater.com/auto: "true"
 
   podSecurityContext:
