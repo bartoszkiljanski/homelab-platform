@@ -73,6 +73,47 @@ sonarr:
   enabled: true
   image:
     tag: 4.0.19.2979-ls321
+  initContainers:
+    - name: configure-external-auth
+      image: busybox:1.38.0
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      command:
+        - /bin/sh
+        - -ec
+        - |
+          config=/config/config.xml
+          test -s "$config"
+
+          methods="$(grep -c '<AuthenticationMethod>' "$config" || true)"
+          external="$(grep -c '<AuthenticationMethod>External</AuthenticationMethod>' "$config" || true)"
+          if [ "$methods" -eq 1 ] && [ "$external" -eq 1 ]; then
+            exit 0
+          fi
+
+          umask 077
+          temporary="$(mktemp /config/config.xml.XXXXXX)"
+          trap 'rm -f "$temporary"' EXIT
+          awk '
+            /<AuthenticationMethod>.*<\/AuthenticationMethod>/ { next }
+            /<\/Config>/ { print "  <AuthenticationMethod>External</AuthenticationMethod>" }
+            { print }
+          ' "$config" > "$temporary"
+          grep -q '<AuthenticationMethod>External</AuthenticationMethod>' "$temporary"
+          mv "$temporary" "$config"
+          trap - EXIT
+      volumeMounts:
+        - name: config
+          mountPath: /config
   env:
     PUID: "1000"
     PGID: "1000"
