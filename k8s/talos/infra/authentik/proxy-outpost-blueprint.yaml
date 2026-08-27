@@ -18,6 +18,12 @@ data:
             name: BentoPDF proxy
           required: true
 
+      - model: authentik_blueprints.metaapplyblueprint
+        attrs:
+          identifiers:
+            name: Sonarr proxy
+          required: true
+
       # This list is authoritative. Add every proxy provider defined by an
       # application blueprint; separate outpost entries would overwrite it.
       - model: authentik_outposts.outpost
@@ -28,3 +34,4 @@ data:
           name: authentik Embedded Outpost
           providers:
             - !Find [authentik_providers_proxy.proxyprovider, [name, BentoPDF]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, Sonarr]]

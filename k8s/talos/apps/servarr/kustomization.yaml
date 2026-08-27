@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: servarr
 
 resources:
+  - httproutes.yaml
   - storage/media-pvc.yaml
 
 helmCharts:

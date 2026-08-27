@@ -8,8 +8,10 @@ resources:
   - groups-blueprint.yaml
   - argocd-blueprint.yaml
   - bentopdf-blueprint.yaml
+  - sonarr-blueprint.yaml
   - proxy-outpost-blueprint.yaml
   - bentopdf-reference-grant.yaml
+  - servarr-reference-grant.yaml
 
 helmCharts:
   - name: authentik
