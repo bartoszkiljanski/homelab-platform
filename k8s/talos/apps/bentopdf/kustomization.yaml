@@ -13,14 +13,3 @@ helmCharts:
     releaseName: bentopdf
     namespace: bentopdf
     valuesFile: values.yaml
-
-patches:
-  - target:
-      kind: Pod
-      name: bentopdf-test-connection
-    patch: |-
-      apiVersion: v1
-      kind: Pod
-      metadata:
-        name: bentopdf-test-connection
-      $patch: delete
