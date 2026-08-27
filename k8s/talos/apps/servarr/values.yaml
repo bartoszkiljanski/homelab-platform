@@ -121,6 +121,8 @@ prowlarr:
 
 flaresolverr:
   enabled: true
+  image:
+    tag: v3.5.0
   resources:
     requests:
       cpu: 100m
