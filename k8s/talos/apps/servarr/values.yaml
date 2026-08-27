@@ -148,6 +148,8 @@ seerr:
 
 bazarr:
   enabled: true
+  image:
+    tag: v1.6.0-ls361
   env:
     PUID: "1000"
     PGID: "1000"
