@@ -27,7 +27,7 @@ data:
           name: Radarr
           mode: proxy
           external_host: https://radarr.home.lanlord.eu
-          internal_host: http://servarr-radarr.servarr.svc.cluster.local:80
+          internal_host: http://servarr-radarr.servarr.svc.cluster.local:7878
           internal_host_ssl_validation: false
           intercept_header_auth: true
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
