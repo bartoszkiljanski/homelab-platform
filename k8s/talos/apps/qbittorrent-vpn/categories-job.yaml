@@ -25,20 +25,12 @@ spec:
           args:
             - |
               base_url=http://qbittorrent-vpn:8080
-              cookie_jar=$(mktemp)
-              trap 'rm -f "$cookie_jar"' EXIT
 
-              until curl -fsS "$base_url/" >/dev/null; do
+              until curl -fsS \
+                --user "$QBITTORRENT_USERNAME:$QBITTORRENT_PASSWORD" \
+                "$base_url/api/v2/app/version" >/dev/null; do
                 sleep 2
               done
-
-              response=$(curl -fsS \
-                --cookie-jar "$cookie_jar" \
-                --header "Referer: $base_url/" \
-                --data-urlencode "username=$QBITTORRENT_USERNAME" \
-                --data-urlencode "password=$QBITTORRENT_PASSWORD" \
-                "$base_url/api/v2/auth/login")
-              test "$response" = "Ok."
 
               set_category() {
                 category=$1
@@ -46,7 +38,7 @@ spec:
                 status=$(curl -sS \
                   --output /dev/null \
                   --write-out '%{http_code}' \
-                  --cookie "$cookie_jar" \
+                  --user "$QBITTORRENT_USERNAME:$QBITTORRENT_PASSWORD" \
                   --header "Referer: $base_url/" \
                   --data-urlencode "category=$category" \
                   --data-urlencode "savePath=$save_path" \
@@ -57,7 +49,7 @@ spec:
                 esac
 
                 curl -fsS \
-                  --cookie "$cookie_jar" \
+                  --user "$QBITTORRENT_USERNAME:$QBITTORRENT_PASSWORD" \
                   --header "Referer: $base_url/" \
                   --data-urlencode "category=$category" \
                   --data-urlencode "savePath=$save_path" \
@@ -81,9 +73,6 @@ spec:
               memory: 16Mi
             limits:
               memory: 64Mi
-          volumeMounts:
-            - name: temp
-              mountPath: /tmp
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -95,6 +84,3 @@ spec:
             runAsUser: 1000
             seccompProfile:
               type: RuntimeDefault
-      volumes:
-        - name: temp
-          emptyDir: {}
