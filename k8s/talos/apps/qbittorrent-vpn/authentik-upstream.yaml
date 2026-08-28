@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: qbittorrent-authentik-upstream
 data:
-  haproxy.cfg: |-
+  haproxy.cfg: |
     global
       log stdout format raw local0
       maxconn 64
