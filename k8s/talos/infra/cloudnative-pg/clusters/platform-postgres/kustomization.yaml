@@ -5,4 +5,5 @@ resources:
   - cluster.yaml
   - tenants/authentik
   - tenants/cleanuparr
+  - tenants/lidarr
   - backup
