@@ -1,40 +1,42 @@
 # Servarr
 
 This application deploys Jellyfin, Sonarr, Radarr, Lidarr, Bazarr, Prowlarr,
-FlareSolverr, Seerr, and Cleanuparr. qBittorrent remains disabled until it can
-share a pod network namespace with a configured Gluetun WireGuard container.
+FlareSolverr, Seerr, and Cleanuparr. qBittorrent is intentionally disabled in
+this chart and deployed by `apps/qbittorrent-vpn` together with Gluetun and
+Proton VPN WireGuard.
 
-## Storage
+## Storage and databases
 
-Application configuration uses dynamically provisioned, retained NFS volumes.
-Media uses the manually managed `servarr-media` claim backed by the Synology
-NFS export at `/volume1/media`. The persistent volume and claim are protected
-from Argo CD pruning. The cluster-scoped volume is owned by the `nfs-csi`
-infrastructure application; this application owns its namespaced claim.
+Application configuration uses dynamically provisioned, retained Synology NFS
+volumes. Media uses the manually managed `servarr-media` claim. Its persistent
+volume and claim are protected from Argo CD pruning.
 
-Configure each application with these paths:
+Sonarr, Radarr, Lidarr, and Cleanuparr use the shared CloudNativePG cluster.
+Their passwords are supplied by External Secrets. Jellyfin, Prowlarr, Bazarr,
+and Seerr retain application-local databases on their NFS configuration
+volumes, so PostgreSQL recovery alone is not a complete stack backup.
 
-- Sonarr root: `/data/media/tv`
-- Radarr root: `/data/media/movies`
-- Lidarr root: `/data/media/music`
-- Jellyfin libraries: the corresponding directories under `/data/media`
-- Future qBittorrent categories: `/data/torrents/tv`,
+The shared media layout is:
+
+- Sonarr library: `/data/media/tv`
+- Radarr library: `/data/media/movies`
+- Lidarr library: `/data/media/music`
+- qBittorrent categories: `/data/torrents/tv`,
   `/data/torrents/movies`, and `/data/torrents/music`
 
-Keeping downloads and libraries beneath `/data` allows atomic moves and
-hardlinks because they remain on one filesystem.
+All download and library paths remain below `/data` on one filesystem. Arr can
+therefore import completed torrents with hardlinks instead of storing a second
+copy. Remote path mappings are not required.
 
-The Arr configuration volumes currently contain SQLite databases. Initial
-schema migrations can therefore be slow over NFS. Moving Sonarr, Radarr, and
-Lidarr to the platform PostgreSQL cluster is intentionally deferred until the
-applications are configured and their databases can be migrated with a tested
-rollback path.
+## Access and authentication
 
-## Initial access
+Gateway API routes expose the configured applications on the LAN gateway.
+Authentik proxy authentication protects the Arr administration interfaces;
+their native authentication is set to external where supported. Jellyfin keeps
+native authentication for compatibility with television and mobile clients.
 
-Ingress is intentionally disabled during the initial setup. Reach a service
-with `kubectl port-forward`, for example:
+## Jellyfin transcoding
 
-```console
-kubectl -n servarr port-forward service/servarr-jellyfin 8096:8096
-```
+Jellyfin currently uses software transcoding. The Talos virtual machines do not
+have a `/dev/dri` device, so hardware acceleration must remain disabled until a
+GPU or iGPU is passed through by Proxmox and exposed to the Jellyfin pod.

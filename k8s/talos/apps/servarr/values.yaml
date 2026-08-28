@@ -196,7 +196,7 @@ sonarr:
       memory: 1Gi
 
 qbittorrent:
-  # Enabled after Gluetun has a real WireGuard provider configuration.
+  # Deployed separately by apps/qbittorrent-vpn with the Gluetun sidecar.
   enabled: false
 
 prowlarr:
