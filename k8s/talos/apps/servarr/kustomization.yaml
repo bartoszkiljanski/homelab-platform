@@ -78,6 +78,14 @@ patches:
       spec:
         template:
           spec:
+            containers:
+              - name: servarr
+                env:
+                  - name: POSTGRES_PASS
+                    valueFrom:
+                      secretKeyRef:
+                        name: cleanuparr-postgres
+                        key: password
             volumes:
               - name: media
                 persistentVolumeClaim:

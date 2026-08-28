@@ -321,6 +321,8 @@ lidarr:
 
 cleanuparr:
   enabled: true
+  # Kept at zero only for the one-time SQLite to PostgreSQL cutover.
+  replicaCount: 0
   image:
     tag: 2.10.3
   securityContext:
@@ -335,7 +337,13 @@ cleanuparr:
       type: RuntimeDefault
   env:
     BASE_PATH: ""
+    DATABASE_PROVIDER: postgres
     PORT: "11011"
+    POSTGRES_DB: cleanuparr
+    POSTGRES_EXTRA_PARAMS: SSL Mode=Require;Trust Server Certificate=true
+    POSTGRES_HOST: platform-postgres-rw.cloudnative-pg.svc.cluster.local
+    POSTGRES_PORT: "5432"
+    POSTGRES_USER: cleanuparr
     PUID: "1000"
     PGID: "1000"
     TZ: Europe/Warsaw
