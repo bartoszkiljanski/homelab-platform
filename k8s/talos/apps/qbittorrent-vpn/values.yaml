@@ -146,7 +146,7 @@ gluetun:
 
 extraContainers:
   - name: authentik-upstream
-    image: haproxy:3.2-alpine
+    image: haproxy:3.4-alpine
     imagePullPolicy: IfNotPresent
     securityContext:
       allowPrivilegeEscalation: false
