@@ -166,6 +166,7 @@ jellyfin:
 
 sonarr:
   enabled: true
+  replicaCount: 0
   image:
     tag: 4.0.19.2979-ls321
   initContainers: *arrExternalAuthInit
