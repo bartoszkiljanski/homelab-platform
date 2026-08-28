@@ -90,17 +90,6 @@ gluetun:
     tag: v3.41.1
     pullPolicy: IfNotPresent
 
-  securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
-      add:
-        - NET_ADMIN
-    privileged: false
-    seccompProfile:
-      type: RuntimeDefault
-
   env:
     VPN_SERVICE_PROVIDER: protonvpn
     VPN_TYPE: wireguard
@@ -114,25 +103,28 @@ gluetun:
         name: proton-vpn-wireguard
 
   startupProbe:
-    httpGet:
-      path: /
-      port: 9999
+    exec:
+      command:
+        - /gluetun-entrypoint
+        - healthcheck
     failureThreshold: 60
     periodSeconds: 5
     timeoutSeconds: 2
 
   livenessProbe:
-    httpGet:
-      path: /
-      port: 9999
+    exec:
+      command:
+        - /gluetun-entrypoint
+        - healthcheck
     failureThreshold: 6
     periodSeconds: 10
     timeoutSeconds: 2
 
   readinessProbe:
-    httpGet:
-      path: /
-      port: 9999
+    exec:
+      command:
+        - /gluetun-entrypoint
+        - healthcheck
     failureThreshold: 3
     periodSeconds: 10
     timeoutSeconds: 2
