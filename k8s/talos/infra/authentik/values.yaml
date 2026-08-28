@@ -28,6 +28,7 @@ blueprints:
     - authentik-blueprint-radarr
     - authentik-blueprint-lidarr
     - authentik-blueprint-prowlarr
+    - authentik-blueprint-bazarr
     - authentik-blueprint-proxy-outpost
 
 server:

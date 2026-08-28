@@ -12,6 +12,7 @@ resources:
   - radarr-blueprint.yaml
   - lidarr-blueprint.yaml
   - prowlarr-blueprint.yaml
+  - bazarr-blueprint.yaml
   - proxy-outpost-blueprint.yaml
   - bentopdf-reference-grant.yaml
   - servarr-reference-grant.yaml
