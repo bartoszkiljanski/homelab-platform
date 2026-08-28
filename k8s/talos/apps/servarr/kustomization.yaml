@@ -109,3 +109,22 @@ patches:
                       secretKeyRef:
                         name: lidarr-postgres
                         key: password
+  - target:
+      kind: Deployment
+      name: servarr-radarr
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: servarr-radarr
+      spec:
+        template:
+          spec:
+            containers:
+              - name: servarr
+                env:
+                  - name: Radarr__Postgres__Password
+                    valueFrom:
+                      secretKeyRef:
+                        name: radarr-postgres
+                        key: password
