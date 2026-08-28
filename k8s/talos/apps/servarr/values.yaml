@@ -40,6 +40,57 @@ x-arr-external-auth-init: &arrExternalAuthInit
       - name: config
         mountPath: /config
 
+x-bazarr-external-auth-init: &bazarrExternalAuthInit
+  - name: configure-external-auth
+    image: busybox:1.38.0
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        config=/config/config/config.yaml
+        test -s "$config"
+
+        current="$(awk '
+          /^auth:[[:space:]]*$/ { in_auth=1; next }
+          in_auth && /^[^[:space:]]/ { exit }
+          in_auth && /^[[:space:]]+type:/ {
+            sub(/^[[:space:]]+type:[[:space:]]*/, "")
+            print
+            exit
+          }
+        ' "$config")"
+        [ "$current" = "null" ] && exit 0
+
+        umask 077
+        temporary="$(mktemp /config/config/config.yaml.XXXXXX)"
+        trap 'rm -f "$temporary"' EXIT
+        awk '
+          /^auth:[[:space:]]*$/ { in_auth=1; print; next }
+          in_auth && /^[^[:space:]]/ { in_auth=0 }
+          in_auth && /^[[:space:]]+type:/ {
+            sub(/type:.*/, "type: null")
+            changed=1
+          }
+          { print }
+          END { if (!changed) exit 1 }
+        ' "$config" > "$temporary"
+        mv "$temporary" "$config"
+        trap - EXIT
+    volumeMounts:
+      - name: config
+        mountPath: /config
+
 jellyfin:
   enabled: true
 
@@ -145,6 +196,7 @@ prowlarr:
   enabled: true
   image:
     tag: 2.5.2.5491-ls156
+  initContainers: *arrExternalAuthInit
   env:
     PUID: "1000"
     PGID: "1000"
@@ -193,6 +245,7 @@ bazarr:
   enabled: true
   image:
     tag: v1.6.0-ls361
+  initContainers: *bazarrExternalAuthInit
   env:
     PUID: "1000"
     PGID: "1000"
@@ -242,6 +295,7 @@ lidarr:
   enabled: true
   image:
     tag: 3.1.0.4875-ls39
+  initContainers: *arrExternalAuthInit
   env:
     PUID: "1000"
     PGID: "1000"
