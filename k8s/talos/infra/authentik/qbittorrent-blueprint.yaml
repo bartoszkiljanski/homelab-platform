@@ -27,7 +27,7 @@ data:
           name: qBittorrent
           mode: proxy
           external_host: https://qbittorrent.home.lanlord.eu
-          internal_host: http://qbittorrent-vpn.qbittorrent-vpn.svc.cluster.local:8080
+          internal_host: http://qbittorrent-authentik-upstream.qbittorrent-vpn.svc.cluster.local:8081
           internal_host_ssl_validation: false
           intercept_header_auth: true
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]

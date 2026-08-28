@@ -16,10 +16,18 @@ spec:
               kubernetes.io/metadata.name: servarr
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: authentik
-        - namespaceSelector:
-            matchLabels:
               kubernetes.io/metadata.name: qbittorrent-vpn
       ports:
         - protocol: TCP
           port: 8080
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: authentik
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: authentik
+              app.kubernetes.io/component: server
+      ports:
+        - protocol: TCP
+          port: 8081

@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qbittorrent-authentik-upstream
+data:
+  haproxy.cfg: |-
+    global
+      log stdout format raw local0
+      maxconn 64
+
+    defaults
+      log global
+      mode http
+      option httplog
+      timeout connect 5s
+      timeout client 1m
+      timeout server 1m
+
+    frontend authentik
+      bind :8081
+      default_backend qbittorrent
+
+    backend qbittorrent
+      server local 127.0.0.1:8080 check
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qbittorrent-authentik-upstream
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: qbittorrent-vpn
+    app.kubernetes.io/instance: qbittorrent-vpn
+  ports:
+    - name: http
+      port: 8081
+      targetPort: authentik
+      protocol: TCP

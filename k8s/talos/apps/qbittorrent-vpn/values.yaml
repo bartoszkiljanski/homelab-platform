@@ -29,8 +29,6 @@ qbittorrent:
         Downloads\TempPath=/data/downloads/incomplete/
         Downloads\TempPathEnabled=true
         WebUI\Address=*
-        WebUI\AuthSubnetWhitelist=10.244.0.0/16
-        WebUI\AuthSubnetWhitelistEnabled=true
         WebUI\LocalHostAuth=false
         WebUI\ServerDomains=*
         WebUI\UseUPnP=false
@@ -105,7 +103,7 @@ gluetun:
       /bin/sh -c 'wget -O- -nv --retry-connrefused
       --post-data "json={\"listen_port\":0,\"current_network_interface\":\"lo\"}"
       http://127.0.0.1:8080/api/v2/app/setPreferences'
-    FIREWALL_INPUT_PORTS: "8080"
+    FIREWALL_INPUT_PORTS: "8080,8081"
     TZ: Europe/Warsaw
 
   envFrom:
@@ -146,9 +144,9 @@ gluetun:
     limits:
       memory: 512Mi
 
-initContainers:
-  - name: configure-proxy-auth
-    image: busybox:1.38.0
+extraContainers:
+  - name: authentik-upstream
+    image: haproxy:3.2-alpine
     imagePullPolicy: IfNotPresent
     securityContext:
       allowPrivilegeEscalation: false
@@ -156,68 +154,43 @@ initContainers:
         drop:
           - ALL
       readOnlyRootFilesystem: true
-      runAsGroup: 1000
+      runAsGroup: 99
       runAsNonRoot: true
-      runAsUser: 1000
+      runAsUser: 99
       seccompProfile:
         type: RuntimeDefault
-    command:
-      - /bin/sh
-      - -ec
-      - |
-        config=/config/qBittorrent/qBittorrent.conf
-        test -s "$config"
-
-        ensure_preference() {
-          key="$1"
-          value="$2"
-          temporary="$(mktemp /config/qBittorrent/qBittorrent.conf.XXXXXX)"
-          trap 'rm -f "$temporary"' EXIT
-
-          awk -v key="$key" -v value="$value" '
-            function write_setting() {
-              if (!setting_written) {
-                print key "=" value
-                setting_written=1
-              }
-            }
-
-            /^\[Preferences\]$/ {
-              in_preferences=1
-              preferences_seen=1
-              print
-              next
-            }
-
-            in_preferences && /^\[/ {
-              write_setting()
-              in_preferences=0
-            }
-
-            in_preferences && index($0, key "=") == 1 {
-              write_setting()
-              next
-            }
-
-            { print }
-
-            END {
-              if (in_preferences) {
-                write_setting()
-              } else if (!preferences_seen) {
-                print ""
-                print "[Preferences]"
-                write_setting()
-              }
-            }
-          ' "$config" > "$temporary"
-
-          mv "$temporary" "$config"
-          trap - EXIT
-        }
-
-        ensure_preference 'WebUI\AuthSubnetWhitelist' '10.244.0.0/16'
-        ensure_preference 'WebUI\AuthSubnetWhitelistEnabled' 'true'
+    ports:
+      - name: authentik
+        containerPort: 8081
+        protocol: TCP
+    startupProbe:
+      tcpSocket:
+        port: authentik
+      failureThreshold: 30
+      periodSeconds: 2
+    livenessProbe:
+      tcpSocket:
+        port: authentik
+      failureThreshold: 3
+      periodSeconds: 10
+    readinessProbe:
+      tcpSocket:
+        port: authentik
+      failureThreshold: 3
+      periodSeconds: 10
+    resources:
+      requests:
+        cpu: 5m
+        memory: 16Mi
+      limits:
+        memory: 64Mi
     volumeMounts:
-      - name: config
-        mountPath: /config
+      - name: authentik-upstream-config
+        mountPath: /usr/local/etc/haproxy/haproxy.cfg
+        subPath: haproxy.cfg
+        readOnly: true
+
+volumes:
+  - name: authentik-upstream-config
+    configMap:
+      name: qbittorrent-authentik-upstream
