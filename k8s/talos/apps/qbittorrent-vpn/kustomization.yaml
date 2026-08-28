@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: qbittorrent-vpn
+
+resources:
+  - namespace.yaml
+  - external-secret.yaml
+  - media-pvc.yaml
+  - network-policy.yaml
+
+helmCharts:
+  - name: qbittorrent-vpn
+    repo: https://bdclark.github.io/helm-charts
+    version: 0.7.6
+    releaseName: qbittorrent-vpn
+    namespace: qbittorrent-vpn
+    valuesFile: values.yaml
+
+patches:
+  - target:
+      kind: Deployment
+      name: qbittorrent-vpn
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: qbittorrent-vpn
+      spec:
+        template:
+          spec:
+            automountServiceAccountToken: false
