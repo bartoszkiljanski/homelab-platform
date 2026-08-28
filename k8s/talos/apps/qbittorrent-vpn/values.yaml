@@ -25,6 +25,11 @@ qbittorrent:
           name: qbittorrent-webui
           key: WebUI_Password_PBKDF2
       config: |-
+        [BitTorrent]
+        Session\DisableAutoTMMByDefault=false
+        Session\DisableAutoTMMTriggers\CategoryChanged=false
+        Session\DisableAutoTMMTriggers\CategorySavePathChanged=false
+
         [LegalNotice]
         Accepted=true
 
