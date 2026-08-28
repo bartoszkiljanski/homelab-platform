@@ -32,6 +32,12 @@ spec:
                 sleep 2
               done
 
+              curl -fsS \
+                --user "$QBITTORRENT_USERNAME:$QBITTORRENT_PASSWORD" \
+                --header "Referer: $base_url/" \
+                --data-urlencode 'json={"auto_tmm_enabled":true,"category_changed_tmm_enabled":true,"save_path_changed_tmm_enabled":true}' \
+                "$base_url/api/v2/app/setPreferences"
+
               set_category() {
                 category=$1
                 save_path=$2
