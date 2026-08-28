@@ -269,6 +269,7 @@ bazarr:
 
 radarr:
   enabled: true
+  replicaCount: 0
   image:
     tag: 6.3.0.10514-ls312
   initContainers: *arrExternalAuthInit
