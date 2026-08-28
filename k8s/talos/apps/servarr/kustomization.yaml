@@ -19,6 +19,17 @@ helmCharts:
 # Chart 1.5.2 does not honor jellyfin.persistence.media.existingClaim for
 # Cleanuparr's shared media volume.
 patches:
+  # Temporary maintenance pause for the Prowlarr PostgreSQL cutover.
+  - target:
+      kind: Deployment
+      name: servarr-prowlarr
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: servarr-prowlarr
+      spec:
+        replicas: 0
   - target:
       kind: Deployment
       name: servarr-.*
