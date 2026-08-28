@@ -166,7 +166,6 @@ jellyfin:
 
 sonarr:
   enabled: true
-  replicaCount: 0
   image:
     tag: 4.0.19.2979-ls321
   initContainers: *arrExternalAuthInit
@@ -175,6 +174,11 @@ sonarr:
     PGID: "1000"
     TZ: Europe/Warsaw
     UMASK: "002"
+    Sonarr__Postgres__Host: platform-postgres-rw.cloudnative-pg.svc.cluster.local
+    Sonarr__Postgres__Port: "5432"
+    Sonarr__Postgres__User: sonarr
+    Sonarr__Postgres__MainDb: sonarr-main
+    Sonarr__Postgres__LogDb: sonarr-log
   persistence:
     enabled: true
     path: tv

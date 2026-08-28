@@ -128,3 +128,22 @@ patches:
                       secretKeyRef:
                         name: radarr-postgres
                         key: password
+  - target:
+      kind: Deployment
+      name: servarr-sonarr
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: servarr-sonarr
+      spec:
+        template:
+          spec:
+            containers:
+              - name: servarr
+                env:
+                  - name: Sonarr__Postgres__Password
+                    valueFrom:
+                      secretKeyRef:
+                        name: sonarr-postgres
+                        key: password
