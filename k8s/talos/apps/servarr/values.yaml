@@ -198,6 +198,8 @@ sonarr:
 qbittorrent:
   # Deployed separately by apps/qbittorrent-vpn with the Gluetun sidecar.
   enabled: false
+  persistence:
+    enabled: false
 
 prowlarr:
   enabled: true
@@ -228,9 +230,9 @@ flaresolverr:
   resources:
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 512Mi
     limits:
-      memory: 1Gi
+      memory: 1536Mi
 
 seerr:
   enabled: true
@@ -367,6 +369,9 @@ cleanuparr:
     storageClass: synology-nfs-retain
     accessMode: ReadWriteMany
     size: 1Gi
+    additionalMounts:
+      - name: media
+        mountPath: /data
   resources:
     requests:
       cpu: 50m
