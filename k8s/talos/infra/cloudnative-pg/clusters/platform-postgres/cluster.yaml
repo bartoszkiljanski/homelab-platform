@@ -53,6 +53,17 @@ spec:
         createrole: false
         passwordSecret:
           name: radarr-postgres
+      - name: sonarr
+        ensure: present
+        inherit: true
+        comment: Sonarr application role
+        connectionLimit: -1
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        passwordSecret:
+          name: sonarr-postgres
 
   plugins:
     - enabled: true

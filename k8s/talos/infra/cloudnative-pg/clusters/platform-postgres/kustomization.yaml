@@ -7,4 +7,5 @@ resources:
   - tenants/cleanuparr
   - tenants/lidarr
   - tenants/radarr
+  - tenants/sonarr
   - backup
