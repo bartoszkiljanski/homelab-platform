@@ -6,6 +6,7 @@ namespace: qbittorrent-vpn
 resources:
   - namespace.yaml
   - authentik-upstream.yaml
+  - categories-job.yaml
   - external-secret.yaml
   - httproute.yaml
   - media-pvc.yaml

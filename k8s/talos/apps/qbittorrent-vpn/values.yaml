@@ -19,6 +19,11 @@ qbittorrent:
   config:
     bootstrap:
       enabled: true
+      webuiPassword:
+        mode: overwrite
+        existingSecret:
+          name: qbittorrent-webui
+          key: WebUI_Password_PBKDF2
       config: |-
         [LegalNotice]
         Accepted=true
