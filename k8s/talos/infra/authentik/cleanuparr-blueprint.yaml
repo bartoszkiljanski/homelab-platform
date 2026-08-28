@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-cleanuparr
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+data:
+  cleanuparr.yaml: |
+    version: 1
+    metadata:
+      name: Cleanuparr OIDC
+      labels:
+        blueprints.goauthentik.io/instantiate: "true"
+    entries:
+      - model: authentik_blueprints.metaapplyblueprint
+        attrs:
+          identifiers:
+            name: Homelab groups
+          required: true
+
+      - model: authentik_providers_oauth2.oauth2provider
+        id: cleanuparr-provider
+        state: present
+        identifiers:
+          name: Cleanuparr
+        attrs:
+          name: Cleanuparr
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+          client_type: confidential
+          client_id: cleanuparr
+          grant_types:
+            - authorization_code
+            - refresh_token
+          signing_key: !Find [authentik_crypto.certificatekeypair, [name, "authentik Self-signed Certificate"]]
+          issuer_mode: per_provider
+          sub_mode: hashed_user_id
+          include_claims_in_id_token: true
+          property_mappings:
+            - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+            - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+            - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+          redirect_uris:
+            - url: https://cleanuparr.home.lanlord.eu/api/auth/oidc/callback
+              matching_mode: strict
+            - url: https://cleanuparr.home.lanlord.eu/api/account/oidc/link/callback
+              matching_mode: strict
+
+      - model: authentik_core.application
+        id: cleanuparr-application
+        state: present
+        identifiers:
+          slug: cleanuparr
+        attrs:
+          name: Cleanuparr
+          slug: cleanuparr
+          provider: !KeyOf cleanuparr-provider
+          policy_engine_mode: any
+          meta_launch_url: https://cleanuparr.home.lanlord.eu
+
+      - model: authentik_policies.policybinding
+        state: present
+        identifiers:
+          target: !KeyOf cleanuparr-application
+          order: 0
+        attrs:
+          group: !Find [authentik_core.group, [name, Homelab Admins]]
