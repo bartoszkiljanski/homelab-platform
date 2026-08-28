@@ -146,7 +146,7 @@ gluetun:
 
 extraContainers:
   - name: port-forward-sync
-    image: curlimages/curl:8.16.0
+    image: curlimages/curl:8.21.0
     imagePullPolicy: IfNotPresent
     securityContext:
       allowPrivilegeEscalation: false
