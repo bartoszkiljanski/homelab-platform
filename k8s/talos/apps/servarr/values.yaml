@@ -130,6 +130,12 @@ jellyfin:
             /data/media/tv \
             /data/media/movies \
             /data/media/music
+
+          for library in movies tv music; do
+            sentinel="/data/media/$library/.jellyfin-keep"
+            mkdir -p "$sentinel"
+            : > "$sentinel/.ignore"
+          done
       volumeMounts:
         - name: media
           mountPath: /data
