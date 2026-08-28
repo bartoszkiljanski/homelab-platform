@@ -217,6 +217,11 @@ prowlarr:
     PGID: "1000"
     TZ: Europe/Warsaw
     UMASK: "002"
+    Prowlarr__Postgres__Host: platform-postgres-rw.cloudnative-pg.svc.cluster.local
+    Prowlarr__Postgres__Port: "5432"
+    Prowlarr__Postgres__User: prowlarr
+    Prowlarr__Postgres__MainDb: prowlarr-main
+    Prowlarr__Postgres__LogDb: prowlarr-log
   persistence:
     enabled: true
     storageClass: synology-nfs-retain
