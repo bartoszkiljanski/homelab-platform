@@ -93,6 +93,8 @@ x-bazarr-external-auth-init: &bazarrExternalAuthInit
 
 jellyfin:
   enabled: true
+  image:
+    tag: 10.11.11ubu2604-ls46
 
   persistence:
     config:
