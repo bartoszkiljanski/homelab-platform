@@ -26,6 +26,7 @@ blueprints:
     - authentik-blueprint-bentopdf
     - authentik-blueprint-sonarr
     - authentik-blueprint-radarr
+    - authentik-blueprint-lidarr
     - authentik-blueprint-proxy-outpost
 
 server:
