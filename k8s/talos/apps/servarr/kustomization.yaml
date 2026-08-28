@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: servarr
 
 resources:
+  - external-secret.yaml
   - httproutes.yaml
   - storage/media-pvc.yaml
 

@@ -20,6 +20,17 @@ spec:
         createrole: false
         passwordSecret:
           name: authentik-postgres
+      - name: cleanuparr
+        ensure: present
+        inherit: true
+        comment: Cleanuparr application role
+        connectionLimit: -1
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        passwordSecret:
+          name: cleanuparr-postgres
 
   plugins:
     - enabled: true
