@@ -6,6 +6,7 @@ resources:
   - tenants/authentik
   - tenants/cleanuparr
   - tenants/lidarr
+  - tenants/prowlarr
   - tenants/radarr
   - tenants/sonarr
   - backup

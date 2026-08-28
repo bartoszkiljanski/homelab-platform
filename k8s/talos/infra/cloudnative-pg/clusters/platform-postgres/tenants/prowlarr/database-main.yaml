@@ -1,0 +1,12 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: platform-postgres-prowlarr-main
+  annotations:
+    argocd.argoproj.io/sync-wave: "35"
+spec:
+  name: prowlarr-main
+  owner: prowlarr
+  databaseReclaimPolicy: retain
+  cluster:
+    name: platform-postgres
