@@ -321,8 +321,7 @@ lidarr:
 
 cleanuparr:
   enabled: true
-  # Kept at zero only for the one-time SQLite to PostgreSQL cutover.
-  replicaCount: 0
+  replicaCount: 1
   image:
     tag: 2.10.3
   securityContext:
