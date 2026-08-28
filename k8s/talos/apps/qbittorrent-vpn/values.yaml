@@ -29,6 +29,8 @@ qbittorrent:
         Downloads\TempPath=/data/downloads/incomplete/
         Downloads\TempPathEnabled=true
         WebUI\Address=*
+        WebUI\AuthSubnetWhitelist=10.244.0.0/16
+        WebUI\AuthSubnetWhitelistEnabled=true
         WebUI\LocalHostAuth=false
         WebUI\ServerDomains=*
         WebUI\UseUPnP=false
@@ -143,3 +145,79 @@ gluetun:
       memory: 128Mi
     limits:
       memory: 512Mi
+
+initContainers:
+  - name: configure-proxy-auth
+    image: busybox:1.38.0
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        config=/config/qBittorrent/qBittorrent.conf
+        test -s "$config"
+
+        ensure_preference() {
+          key="$1"
+          value="$2"
+          temporary="$(mktemp /config/qBittorrent/qBittorrent.conf.XXXXXX)"
+          trap 'rm -f "$temporary"' EXIT
+
+          awk -v key="$key" -v value="$value" '
+            function write_setting() {
+              if (!setting_written) {
+                print key "=" value
+                setting_written=1
+              }
+            }
+
+            /^\[Preferences\]$/ {
+              in_preferences=1
+              preferences_seen=1
+              print
+              next
+            }
+
+            in_preferences && /^\[/ {
+              write_setting()
+              in_preferences=0
+            }
+
+            in_preferences && index($0, key "=") == 1 {
+              write_setting()
+              next
+            }
+
+            { print }
+
+            END {
+              if (in_preferences) {
+                write_setting()
+              } else if (!preferences_seen) {
+                print ""
+                print "[Preferences]"
+                write_setting()
+              }
+            }
+          ' "$config" > "$temporary"
+
+          mv "$temporary" "$config"
+          trap - EXIT
+        }
+
+        ensure_preference 'WebUI\AuthSubnetWhitelist' '10.244.0.0/16'
+        ensure_preference 'WebUI\AuthSubnetWhitelistEnabled' 'true'
+    volumeMounts:
+      - name: config
+        mountPath: /config

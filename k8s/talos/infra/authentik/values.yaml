@@ -29,6 +29,7 @@ blueprints:
     - authentik-blueprint-lidarr
     - authentik-blueprint-prowlarr
     - authentik-blueprint-bazarr
+    - authentik-blueprint-qbittorrent
     - authentik-blueprint-cleanuparr
     - authentik-blueprint-proxy-outpost
 

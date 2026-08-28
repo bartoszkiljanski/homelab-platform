@@ -48,6 +48,12 @@ data:
             name: Bazarr proxy
           required: true
 
+      - model: authentik_blueprints.metaapplyblueprint
+        attrs:
+          identifiers:
+            name: qBittorrent proxy
+          required: true
+
       # This list is authoritative. Add every proxy provider defined by an
       # application blueprint; separate outpost entries would overwrite it.
       - model: authentik_outposts.outpost
@@ -63,3 +69,4 @@ data:
             - !Find [authentik_providers_proxy.proxyprovider, [name, Lidarr]]
             - !Find [authentik_providers_proxy.proxyprovider, [name, Prowlarr]]
             - !Find [authentik_providers_proxy.proxyprovider, [name, Bazarr]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, qBittorrent]]
