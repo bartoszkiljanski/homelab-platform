@@ -90,3 +90,22 @@ patches:
               - name: media
                 persistentVolumeClaim:
                   claimName: servarr-media
+  - target:
+      kind: Deployment
+      name: servarr-lidarr
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: servarr-lidarr
+      spec:
+        template:
+          spec:
+            containers:
+              - name: servarr
+                env:
+                  - name: Lidarr__Postgres__Password
+                    valueFrom:
+                      secretKeyRef:
+                        name: lidarr-postgres
+                        key: password

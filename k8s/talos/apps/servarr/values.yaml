@@ -295,7 +295,6 @@ radarr:
 
 lidarr:
   enabled: true
-  replicaCount: 0
   image:
     tag: 3.1.0.4875-ls39
   initContainers: *arrExternalAuthInit
@@ -304,6 +303,11 @@ lidarr:
     PGID: "1000"
     TZ: Europe/Warsaw
     UMASK: "002"
+    Lidarr__Postgres__Host: platform-postgres-rw.cloudnative-pg.svc.cluster.local
+    Lidarr__Postgres__Port: "5432"
+    Lidarr__Postgres__User: lidarr
+    Lidarr__Postgres__MainDb: lidarr-main
+    Lidarr__Postgres__LogDb: lidarr-log
   persistence:
     enabled: true
     path: music
