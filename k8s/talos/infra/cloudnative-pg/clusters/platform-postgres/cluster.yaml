@@ -42,6 +42,17 @@ spec:
         createrole: false
         passwordSecret:
           name: lidarr-postgres
+      - name: radarr
+        ensure: present
+        inherit: true
+        comment: Radarr application role
+        connectionLimit: -1
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        passwordSecret:
+          name: radarr-postgres
 
   plugins:
     - enabled: true

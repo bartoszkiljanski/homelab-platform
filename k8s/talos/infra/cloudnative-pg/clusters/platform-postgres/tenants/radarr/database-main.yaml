@@ -1,0 +1,12 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: platform-postgres-radarr-main
+  annotations:
+    argocd.argoproj.io/sync-wave: "35"
+spec:
+  name: radarr-main
+  owner: radarr
+  databaseReclaimPolicy: retain
+  cluster:
+    name: platform-postgres
