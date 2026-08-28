@@ -36,6 +36,12 @@ data:
             name: Lidarr proxy
           required: true
 
+      - model: authentik_blueprints.metaapplyblueprint
+        attrs:
+          identifiers:
+            name: Prowlarr proxy
+          required: true
+
       # This list is authoritative. Add every proxy provider defined by an
       # application blueprint; separate outpost entries would overwrite it.
       - model: authentik_outposts.outpost
@@ -49,3 +55,4 @@ data:
             - !Find [authentik_providers_proxy.proxyprovider, [name, Sonarr]]
             - !Find [authentik_providers_proxy.proxyprovider, [name, Radarr]]
             - !Find [authentik_providers_proxy.proxyprovider, [name, Lidarr]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, Prowlarr]]

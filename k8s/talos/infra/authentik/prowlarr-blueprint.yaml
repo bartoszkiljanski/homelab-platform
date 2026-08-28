@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-prowlarr
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+data:
+  prowlarr.yaml: |
+    version: 1
+    metadata:
+      name: Prowlarr proxy
+      labels:
+        blueprints.goauthentik.io/instantiate: "true"
+    entries:
+      - model: authentik_blueprints.metaapplyblueprint
+        attrs:
+          identifiers:
+            name: Homelab groups
+          required: true
+
+      - model: authentik_providers_proxy.proxyprovider
+        id: prowlarr-provider
+        state: present
+        identifiers:
+          name: Prowlarr
+        attrs:
+          name: Prowlarr
+          mode: proxy
+          external_host: https://prowlarr.home.lanlord.eu
+          internal_host: http://servarr-prowlarr.servarr.svc.cluster.local:9696
+          internal_host_ssl_validation: false
+          intercept_header_auth: true
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+
+      - model: authentik_core.application
+        id: prowlarr-application
+        state: present
+        identifiers:
+          slug: prowlarr
+        attrs:
+          name: Prowlarr
+          slug: prowlarr
+          provider: !KeyOf prowlarr-provider
+          policy_engine_mode: any
+          meta_launch_url: https://prowlarr.home.lanlord.eu
+
+      - model: authentik_policies.policybinding
+        state: present
+        identifiers:
+          target: !KeyOf prowlarr-application
+          order: 0
+        attrs:
+          group: !Find [authentik_core.group, [name, Homelab Admins]]
