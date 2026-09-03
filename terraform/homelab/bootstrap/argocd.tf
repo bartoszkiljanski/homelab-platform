@@ -5,7 +5,7 @@ resource "helm_release" "argocd" {
   namespace  = "argocd"
   repository = "oci://ghcr.io/argoproj/argo-helm"
   chart      = "argo-cd"
-  version    = "10.6.4"
+  version    = "10.7.1"
 
   create_namespace = true
   values           = [file(local.argocd_values_path)]
