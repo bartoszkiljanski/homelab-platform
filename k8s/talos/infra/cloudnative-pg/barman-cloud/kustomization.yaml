@@ -12,3 +12,4 @@ helmCharts:
     version: 0.8.0
     releaseName: plugin-barman-cloud
     namespace: cloudnative-pg
+    valuesFile: values.yaml
