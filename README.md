@@ -33,15 +33,16 @@ storage traffic use `vmbr1`.
 | Storage protocols | NFS for media and application configuration; iSCSI for PostgreSQL |
 | Off-site backup | Backblaze B2 |
 
-| Component     | Version      | Managed by                        |
-| ------------- | ------------ | --------------------------------- |
-| Proxmox VE    | 9.2          | Operator                          |
-| Talos Linux   | 1.13.9       | Terraform                         |
-| Kubernetes    | 1.36.3       | Talos                             |
-| Cilium        | 1.20.1       | Terraform bootstrap, then Argo CD |
-| Argo CD       | chart 10.4.0 | Terraform bootstrap, then Argo CD |
-| CloudNativePG | chart 0.29.0 | Argo CD                           |
-| Authentik     | 2026.8.0     | Argo CD                           |
+| Component     | Version        | Managed by                        |
+| ------------- | -------------- | --------------------------------- |
+| Proxmox VE    | 9.2            | Operator                          |
+| Talos Linux   | 1.13.9         | Terraform                         |
+| Kubernetes    | 1.36.3         | Talos                             |
+| Cilium        | 1.20.1         | Terraform bootstrap, then Argo CD |
+| Argo CD       | chart 10.8.0   | Terraform bootstrap, then Argo CD |
+| Traefik       | chart 41.4.0   | Argo CD                           |
+| CloudNativePG | chart 0.29.0   | Argo CD                           |
+| Authentik     | chart 2026.8.1 | Argo CD                           |
 
 The `foundation` Terraform root manages the Talos image, NoCloud snippets,
 VMs, machine configuration, etcd bootstrap, and generated client files. The
@@ -72,7 +73,7 @@ Proxmox must provide:
 - the scoped `homelab-tf@pve!foundation` API token;
 - SSH access for uploading snippets.
 
-The workstation needs Task 3.x, Terraform 1.15.x, `talosctl` 1.13.9,
+The workstation needs Task 3.x, Terraform 1.16.x, `talosctl` 1.13.9,
 `kubectl` 1.36.x, Git, and optionally k9s.
 
 Set the Proxmox provider variables in the active shell:
