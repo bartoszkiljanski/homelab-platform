@@ -23,4 +23,7 @@ spec:
     data:
       compression: gzip
 
+  instanceSidecarConfiguration:
+    retentionPolicyIntervalSeconds: 1800
+
   retentionPolicy: "30d"
