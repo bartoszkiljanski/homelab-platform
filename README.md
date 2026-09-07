@@ -1,8 +1,8 @@
 # Talos homelab platform
 
-Infrastructure as code for a three-node Talos Linux Kubernetes cluster on one
-Proxmox VE host. Terraform creates the platform and bootstraps Cilium and Argo
-CD; Argo CD owns both releases after handoff.
+A GitOps-managed homelab Kubernetes platform built as a platform-engineering
+proof of concept. Terraform provisions a three-node Talos Linux cluster on
+Proxmox, then hands workload management to Argo CD.
 
 ## Architecture
 
@@ -22,8 +22,16 @@ CD; Argo CD owns both releases after handoff.
 ```
 
 All control-plane nodes are schedulable. Kubernetes uses `vmbr0`; etcd and
-storage traffic use `vmbr1`. Control-plane redundancy does not remove the
-single Proxmox host as a physical failure domain.
+storage traffic use `vmbr1`.
+
+## Lab hardware
+
+| Role | Hardware |
+| --- | --- |
+| Compute | GMKtec K8 Plus, Ryzen 7 8845HS, 32 GB RAM, 1 TB NVMe, Proxmox VE |
+| Storage | Synology DS225+, 2 × 1 TB drives in SHR |
+| Storage protocols | NFS for media and application configuration; iSCSI for PostgreSQL |
+| Off-site backup | Backblaze B2 |
 
 | Component     | Version      | Managed by                        |
 | ------------- | ------------ | --------------------------------- |
