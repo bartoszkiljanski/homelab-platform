@@ -91,8 +91,21 @@ x-bazarr-external-auth-init: &bazarrExternalAuthInit
       - name: config
         mountPath: /config
 
+x-servarr-pod-labels: &servarrPodLabels
+  homelab.platform/workload: servarr
+
+x-servarr-topology-spread: &servarrTopologySpread
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        homelab.platform/workload: servarr
+
 jellyfin:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   image:
     tag: 10.11.11ubu2604-ls46
 
@@ -172,6 +185,8 @@ jellyfin:
 
 sonarr:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   image:
     tag: 4.0.19.2979-ls321
   initContainers: *arrExternalAuthInit
@@ -209,6 +224,8 @@ qbittorrent:
 
 prowlarr:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   image:
     tag: 2.5.2.5491-ls156
   initContainers: *arrExternalAuthInit
@@ -236,6 +253,8 @@ prowlarr:
 
 flaresolverr:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   image:
     tag: v3.5.0
   resources:
@@ -247,6 +266,8 @@ flaresolverr:
 
 seerr:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   image:
     tag: v3.4.0
   persistence:
@@ -263,6 +284,8 @@ seerr:
 
 bazarr:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   image:
     tag: v1.6.0-ls361
   initContainers: *bazarrExternalAuthInit
@@ -287,6 +310,8 @@ bazarr:
 
 radarr:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   image:
     tag: 6.3.0.10514-ls312
   initContainers: *arrExternalAuthInit
@@ -318,6 +343,8 @@ radarr:
 
 lidarr:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   image:
     tag: 3.1.0.4875-ls39
   initContainers: *arrExternalAuthInit
@@ -349,6 +376,8 @@ lidarr:
 
 cleanuparr:
   enabled: true
+  podLabels: *servarrPodLabels
+  topologySpreadConstraints: *servarrTopologySpread
   replicaCount: 1
   image:
     tag: 2.10.3

@@ -15,6 +15,17 @@ authentik:
 postgresql:
   enabled: false
 
+x-authentik-pod-labels: &authentikPodLabels
+  homelab.platform/workload: authentik
+
+x-authentik-topology-spread: &authentikTopologySpread
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        homelab.platform/workload: authentik
+
 # Managed outposts are not required, so avoid creating their cluster-scoped RBAC.
 serviceAccount:
   create: false
@@ -35,6 +46,8 @@ blueprints:
 
 server:
   replicas: 1
+  podLabels: *authentikPodLabels
+  topologySpreadConstraints: *authentikTopologySpread
   resources:
     requests:
       cpu: 100m
@@ -55,6 +68,8 @@ server:
 
 worker:
   replicas: 1
+  podLabels: *authentikPodLabels
+  topologySpreadConstraints: *authentikTopologySpread
   resources:
     requests:
       cpu: 100m
