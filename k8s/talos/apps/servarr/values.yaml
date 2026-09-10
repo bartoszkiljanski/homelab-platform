@@ -107,7 +107,7 @@ jellyfin:
   podLabels: *servarrPodLabels
   topologySpreadConstraints: *servarrTopologySpread
   image:
-    tag: 10.11.11ubu2604-ls46
+    tag: 12.0ubu2604-ls48
 
   persistence:
     config:
