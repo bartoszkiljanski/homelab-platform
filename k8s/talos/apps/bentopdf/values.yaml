@@ -1,5 +1,9 @@
 replicaCount: 1
 
+image:
+  repository: ghcr.io/alam00000/bentopdf-simple
+  tag: 2.8.7
+
 serviceAccount:
   create: true
   automountServiceAccountToken: false
