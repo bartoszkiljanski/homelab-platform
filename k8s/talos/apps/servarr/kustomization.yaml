@@ -3,6 +3,9 @@ kind: Kustomization
 
 namespace: servarr
 
+commonAnnotations:
+  reloader.stakater.com/auto: "true"
+
 resources:
   - external-secret.yaml
   - httproutes.yaml

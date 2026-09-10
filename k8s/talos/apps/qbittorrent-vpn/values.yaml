@@ -3,6 +3,9 @@ replicaCount: 1
 strategy:
   type: Recreate
 
+deploymentAnnotations:
+  reloader.stakater.com/auto: "true"
+
 qbittorrent:
   image:
     repository: linuxserver/qbittorrent

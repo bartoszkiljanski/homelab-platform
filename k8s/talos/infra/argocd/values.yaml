@@ -39,6 +39,8 @@ dex:
 server:
   service:
     type: ClusterIP
+  deploymentAnnotations:
+    secret.reloader.stakater.com/reload: argocd-authentik-oidc
   resources:
     requests:
       cpu: 25m
