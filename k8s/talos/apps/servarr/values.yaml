@@ -389,7 +389,7 @@ cleanuparr:
   replicaCount: 1
   image:
     repository: ghcr.io/cleanuparr/cleanuparr
-    tag: 2.10.3
+    tag: 2.10.5
   securityContext:
     allowPrivilegeEscalation: false
     capabilities:
