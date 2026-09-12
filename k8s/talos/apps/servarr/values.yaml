@@ -260,7 +260,7 @@ flaresolverr:
   topologySpreadConstraints: *servarrTopologySpread
   image:
     repository: ghcr.io/flaresolverr/flaresolverr
-    tag: v3.5.0
+    tag: v3.5.2
   resources:
     requests:
       cpu: 100m
