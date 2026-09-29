@@ -9,7 +9,7 @@ deploymentAnnotations:
 qbittorrent:
   image:
     repository: linuxserver/qbittorrent
-    tag: 5.2.3
+    tag: 5.2.4
     pullPolicy: IfNotPresent
 
   env:
