@@ -10,7 +10,7 @@ resources:
 helmCharts:
   - name: synology-csi
     repo: https://christian-schlichtherle.github.io/synology-csi-chart
-    version: 0.11.3
+    version: 0.11.4
     releaseName: synology-csi
     namespace: synology-csi
     valuesFile: values.yaml
