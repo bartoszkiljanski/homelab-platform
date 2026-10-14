@@ -15,7 +15,7 @@ resources:
 helmCharts:
   - name: qbittorrent-vpn
     repo: https://bdclark.github.io/helm-charts
-    version: 0.7.6
+    version: 0.7.7
     releaseName: qbittorrent-vpn
     namespace: qbittorrent-vpn
     valuesFile: values.yaml
