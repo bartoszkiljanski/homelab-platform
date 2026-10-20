@@ -17,7 +17,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: configure
-          image: linuxserver/qbittorrent:5.2.4
+          image: linuxserver/qbittorrent:5.3.0
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
